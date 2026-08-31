@@ -161,6 +161,12 @@ Every feature is computed using data available **before** the transfer date. Pos
 - [ ] Phase 11: Testing
 - [ ] Phase 12: Documentation
 
+## 👥 Authors & Contributors
+
+- **Frontend:** Asheel Mohammad
+- **Backend:** Muhammed Sahil ([@mhdsahil1](https://github.com/mhdsahil1))
+
 ## 📜 License
 
 This project is for educational and portfolio purposes. Football data is sourced from [Transfermarkt](https://www.transfermarkt.com/) via the [transfermarkt-datasets](https://github.com/dcaribou/transfermarkt-datasets) project.
+
