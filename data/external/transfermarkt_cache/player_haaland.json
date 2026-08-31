@@ -1,0 +1,466 @@
+{
+  "player_id": "418560",
+  "player_name": "Erling Haaland",
+  "profile_url": "https://www.transfermarkt.com/erling-haaland/profil/spieler/418560",
+  "jersey_number": "9",
+  "current_club": "Manchester City",
+  "league": {
+    "name": "Premier League",
+    "country": "England",
+    "division": "First Tier"
+  },
+  "arrival_date": "01/07/2022",
+  "contract_end": "30/06/2034",
+  "market_value": "220.00M€",
+  "full_name": "Erling Braut Håland",
+  "age": "26",
+  "place_of_birth": "Leeds",
+  "citizenship": "Norway",
+  "height": "1,95 m",
+  "position": "Attack - Centre-Forward",
+  "foot": "left",
+  "agent": "Rafaela Pimenta",
+  "outfitter": "Nike",
+  "last_contract_extension": "17/01/2025",
+  "social_media": [
+    {
+      "type": "Twitter",
+      "url": "http://twitter.com/ErlingHaaland"
+    },
+    {
+      "type": "Facebook",
+      "url": "http://www.facebook.com/profile.php?id=100052762394674"
+    },
+    {
+      "type": "Instagram",
+      "url": "http://instagram.com/erling/"
+    }
+  ],
+  "trophies": [
+    {
+      "trophy": "UEFA Best Player in Europe ",
+      "count": 1
+    },
+    {
+      "trophy": "Golden Boot winner (Europe)",
+      "count": 1
+    },
+    {
+      "trophy": "UEFA Champions League winner",
+      "count": 1
+    },
+    {
+      "trophy": "English Champion",
+      "count": 2
+    },
+    {
+      "trophy": "Uefa Supercup winner",
+      "count": 1
+    }
+  ],
+  "transfer_history": [
+    {
+      "season": "22/23",
+      "date": "2022-07-01",
+      "left": "Dortmund",
+      "joined": "Man City",
+      "market_value": "€150.00m",
+      "fee": "€60.00m"
+    },
+    {
+      "season": "19/20",
+      "date": "2020-01-01",
+      "left": "Salzburg",
+      "joined": "Dortmund",
+      "market_value": "€45.00m",
+      "fee": "€20.00m"
+    },
+    {
+      "season": "18/19",
+      "date": "2019-01-01",
+      "left": "Molde FK",
+      "joined": "Salzburg",
+      "market_value": "€5.00m",
+      "fee": "€8.00m"
+    },
+    {
+      "season": "16/17",
+      "date": "2017-02-01",
+      "left": "Bryne",
+      "joined": "Molde FK",
+      "market_value": "€200k",
+      "fee": "€100k"
+    },
+    {
+      "season": "15/16",
+      "date": "2015-09-08",
+      "left": "Bryne FK Yth.",
+      "joined": "Bryne",
+      "market_value": "-",
+      "fee": "-"
+    }
+  ],
+  "season_stats": [
+    {
+      "season": "2026/27",
+      "competitions": [
+        {
+          "competition": "Premier League",
+          "appearances": 2,
+          "goals": 2,
+          "assists": 0,
+          "minutes_played": 180,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Community Shield",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 53,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2025/26",
+      "competitions": [
+        {
+          "competition": "Premier League",
+          "appearances": 35,
+          "goals": 27,
+          "assists": 8,
+          "minutes_played": 2959,
+          "yellow_cards": 2,
+          "red_cards": 0,
+          "penalty_goals": 3
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 10,
+          "goals": 8,
+          "assists": 0,
+          "minutes_played": 755,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "FIFA World Cup",
+          "appearances": 5,
+          "goals": 7,
+          "assists": 1,
+          "minutes_played": 465,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "FA Cup",
+          "appearances": 4,
+          "goals": 3,
+          "assists": 1,
+          "minutes_played": 231,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 3,
+          "goals": 1,
+          "assists": 0,
+          "minutes_played": 180,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "EFL Cup",
+          "appearances": 3,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 199,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2024/25",
+      "competitions": [
+        {
+          "competition": "Premier League",
+          "appearances": 31,
+          "goals": 22,
+          "assists": 3,
+          "minutes_played": 2743,
+          "yellow_cards": 2,
+          "red_cards": 0,
+          "penalty_goals": 3
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 9,
+          "goals": 8,
+          "assists": 0,
+          "minutes_played": 771,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 2
+        },
+        {
+          "competition": "FIFA World Cup Qualifying (Europe)",
+          "appearances": 8,
+          "goals": 16,
+          "assists": 2,
+          "minutes_played": 707,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Nations League B",
+          "appearances": 6,
+          "goals": 7,
+          "assists": 1,
+          "minutes_played": 533,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "FIFA Club World Cup",
+          "appearances": 4,
+          "goals": 3,
+          "assists": 1,
+          "minutes_played": 257,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "FA Cup",
+          "appearances": 3,
+          "goals": 1,
+          "assists": 1,
+          "minutes_played": 182,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Community Shield",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2023/24",
+      "competitions": [
+        {
+          "competition": "Premier League",
+          "appearances": 31,
+          "goals": 27,
+          "assists": 6,
+          "minutes_played": 2558,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 7
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 9,
+          "goals": 6,
+          "assists": 1,
+          "minutes_played": 779,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 2
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 5,
+          "goals": 4,
+          "assists": 0,
+          "minutes_played": 362,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "FA Cup",
+          "appearances": 3,
+          "goals": 5,
+          "assists": 0,
+          "minutes_played": 254,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Community Shield",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 64,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Super Cup",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2022/23",
+      "competitions": [
+        {
+          "competition": "Premier League",
+          "appearances": 35,
+          "goals": 36,
+          "assists": 8,
+          "minutes_played": 2777,
+          "yellow_cards": 5,
+          "red_cards": 0,
+          "penalty_goals": 7
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 11,
+          "goals": 12,
+          "assists": 1,
+          "minutes_played": 846,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "UEFA Nations League B",
+          "appearances": 6,
+          "goals": 6,
+          "assists": 1,
+          "minutes_played": 499,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 2
+        },
+        {
+          "competition": "UEFA Euro Qualifying",
+          "appearances": 5,
+          "goals": 6,
+          "assists": 0,
+          "minutes_played": 429,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 2
+        },
+        {
+          "competition": "FA Cup",
+          "appearances": 4,
+          "goals": 3,
+          "assists": 0,
+          "minutes_played": 311,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "EFL Cup",
+          "appearances": 2,
+          "goals": 1,
+          "assists": 0,
+          "minutes_played": 107,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Community Shield",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2021/22",
+      "competitions": [
+        {
+          "competition": "Bundesliga",
+          "appearances": 24,
+          "goals": 22,
+          "assists": 8,
+          "minutes_played": 1915,
+          "yellow_cards": 3,
+          "red_cards": 0,
+          "penalty_goals": 6
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 3,
+          "goals": 3,
+          "assists": 0,
+          "minutes_played": 203,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 2,
+          "goals": 3,
+          "assists": 1,
+          "minutes_played": 126,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "DFB-Pokal",
+          "appearances": 2,
+          "goals": 4,
+          "assists": 0,
+          "minutes_played": 180,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 2
+        },
+        {
+          "competition": "Franz-Beckenbauer-Supercup",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    }
+  ],
+  "last_updated": "2026-08-30 19:40:55"
+}

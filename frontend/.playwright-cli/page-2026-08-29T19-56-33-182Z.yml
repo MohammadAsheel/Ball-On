@@ -1,0 +1,229 @@
+- generic [active] [ref=f1e1]:
+  - banner [ref=f1e2]:
+    - generic [ref=f1e3]:
+      - link "BALLON PRO" [ref=f1e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=f1e5]: BALLON
+        - generic [ref=f1e6]: PRO
+      - generic [ref=f1e7]: LIVE SESSION / SYNCING
+      - button "Open command palette" [ref=f1e10]:
+        - generic [ref=f1e14]: Search intelligence
+        - generic [ref=f1e15]: ⌘ K
+  - main [ref=f1e16]:
+    - generic [ref=f1e18]:
+      - generic [ref=f1e19]:
+        - generic [ref=f1e20]:
+          - paragraph [ref=f1e21]: Football valuation intelligence / 2026
+          - heading [level=1] [ref=f1e22]:
+            - text: The market,
+            - emphasis [ref=f1e23]: measured
+            - text: with intent.
+        - generic [ref=f1e24]:
+          - generic [ref=f1e25]:
+            - paragraph [ref=f1e26]: Tracked entities
+            - paragraph [ref=f1e27]: 50,000+
+          - generic [ref=f1e28]:
+            - paragraph [ref=f1e29]: Session status
+            - paragraph [ref=f1e30]: ● MARKET OPEN
+      - generic [ref=f1e31]:
+        - generic [ref=f1e32]:
+          - generic [ref=f1e33]:
+            - generic [ref=f1e34]:
+              - paragraph [ref=f1e35]: Market valuation / 01
+              - heading "Kylian Mbappé" [level=2] [ref=f1e36]
+              - paragraph [ref=f1e37]: Forward · Primary market model
+            - button [ref=f1e38]
+          - generic [ref=f1e42]:
+            - generic [ref=f1e43]:
+              - paragraph [ref=f1e44]: Algorithm valuation
+              - paragraph [ref=f1e45]: €115M
+              - generic [ref=f1e46]:
+                - generic [ref=f1e47]: +12.8% EDGE
+                - generic [ref=f1e48]: against current market signal
+            - generic [ref=f1e49]:
+              - generic [ref=f1e50]:
+                - paragraph [ref=f1e51]: Market value
+                - paragraph [ref=f1e52]: €101M
+              - generic [ref=f1e53]:
+                - paragraph [ref=f1e54]: Confidence
+                - paragraph [ref=f1e55]: 91.4%
+              - generic [ref=f1e56]:
+                - paragraph [ref=f1e57]: Model drift
+                - paragraph [ref=f1e58]: LOW
+              - generic [ref=f1e59]:
+                - paragraph [ref=f1e60]: Sample size
+                - paragraph [ref=f1e61]: 2,481
+          - generic [ref=f1e62]:
+            - generic [ref=f1e63]:
+              - paragraph [ref=f1e64]: GOALS
+              - paragraph [ref=f1e65]: "18"
+            - generic [ref=f1e66]:
+              - paragraph [ref=f1e67]: AGE CURVE
+              - paragraph [ref=f1e68]: 24Y
+            - generic [ref=f1e69]:
+              - paragraph [ref=f1e70]: CONTRACT
+              - paragraph [ref=f1e71]: 3.8Y
+            - generic [ref=f1e72]:
+              - paragraph [ref=f1e73]: LEAGUE
+              - paragraph [ref=f1e74]: "82"
+        - generic [ref=f1e75]:
+          - generic [ref=f1e77]:
+            - paragraph [ref=f1e78]: Scenario controls
+            - heading "Estimator terminal" [level=2] [ref=f1e79]
+          - generic [ref=f1e83]:
+            - generic [ref=f1e84]:
+              - generic [ref=f1e85]:
+                - generic [ref=f1e86]: Age curve
+                - generic [ref=f1e87]: 24 yrs
+              - slider [ref=f1e88] [cursor=pointer]: "24"
+            - generic [ref=f1e89]:
+              - generic [ref=f1e90]:
+                - generic [ref=f1e91]: Goals / season
+                - generic [ref=f1e92]: "18"
+              - slider [ref=f1e93] [cursor=pointer]: "18"
+            - generic [ref=f1e94]:
+              - generic [ref=f1e95]:
+                - generic [ref=f1e96]: League coefficient
+                - generic [ref=f1e97]: 82 /100
+              - slider [ref=f1e98] [cursor=pointer]: "82"
+            - generic [ref=f1e99]:
+              - generic [ref=f1e100]:
+                - generic [ref=f1e101]: Injury risk
+                - generic [ref=f1e102]: 12%
+              - slider [ref=f1e103] [cursor=pointer]: "12"
+          - generic [ref=f1e104]:
+            - generic [ref=f1e105]:
+              - generic [ref=f1e106]: Estimated range
+              - generic [ref=f1e107]: €106M — €127M
+            - link "Open full valuation engine" [ref=f1e108] [cursor=pointer]:
+              - /url: /estimator
+      - generic [ref=f1e112]:
+        - generic [ref=f1e113]:
+          - generic [ref=f1e114]:
+            - paragraph [ref=f1e115]: Global entity catalog
+            - heading "Market leaders" [level=2] [ref=f1e116]
+          - generic [ref=f1e117]:
+            - button [ref=f1e118]
+            - button [ref=f1e121]
+        - generic [ref=f1e123]:
+          - generic [ref=f1e124]:
+            - button "All Players" [ref=f1e125]
+            - button "Active Stars" [ref=f1e126]
+            - button "Historical Legends" [ref=f1e127]
+          - textbox "Filter catalog…" [ref=f1e132]
+          - button "Filters" [ref=f1e133]
+        - generic [ref=f1e137]:
+          - link "KM 01 Kylian Mbappé Real Madrid · Attack APP 28 GOALS 18 ASSISTS 7 Market value €180.00M" [ref=f1e138] [cursor=pointer]:
+            - /url: /players/1
+            - generic [ref=f1e139]:
+              - generic [ref=f1e140]: KM
+              - generic [ref=f1e141]: "01"
+            - heading "Kylian Mbappé" [level=3] [ref=f1e142]
+            - paragraph [ref=f1e143]: Real Madrid · Attack
+            - generic [ref=f1e144]:
+              - generic [ref=f1e145]:
+                - paragraph [ref=f1e146]: APP
+                - paragraph [ref=f1e147]: "28"
+              - generic [ref=f1e148]:
+                - paragraph [ref=f1e149]: GOALS
+                - paragraph [ref=f1e150]: "18"
+              - generic [ref=f1e151]:
+                - paragraph [ref=f1e152]: ASSISTS
+                - paragraph [ref=f1e153]: "7"
+            - generic [ref=f1e154]:
+              - generic [ref=f1e155]: Market value
+              - generic [ref=f1e156]: €180.00M
+          - link "EH 02 Erling Haaland Manchester City · Attack APP 29 GOALS 16 ASSISTS 8 Market value €175.00M" [ref=f1e157] [cursor=pointer]:
+            - /url: /players/2
+            - generic [ref=f1e158]:
+              - generic [ref=f1e159]: EH
+              - generic [ref=f1e160]: "02"
+            - heading "Erling Haaland" [level=3] [ref=f1e161]
+            - paragraph [ref=f1e162]: Manchester City · Attack
+            - generic [ref=f1e163]:
+              - generic [ref=f1e164]:
+                - paragraph [ref=f1e165]: APP
+                - paragraph [ref=f1e166]: "29"
+              - generic [ref=f1e167]:
+                - paragraph [ref=f1e168]: GOALS
+                - paragraph [ref=f1e169]: "16"
+              - generic [ref=f1e170]:
+                - paragraph [ref=f1e171]: ASSISTS
+                - paragraph [ref=f1e172]: "8"
+            - generic [ref=f1e173]:
+              - generic [ref=f1e174]: Market value
+              - generic [ref=f1e175]: €175.00M
+          - link "JB 03 Jude Bellingham Real Madrid · Midfield APP 30 GOALS 14 ASSISTS 9 Market value €160.00M" [ref=f1e176] [cursor=pointer]:
+            - /url: /players/3
+            - generic [ref=f1e177]:
+              - generic [ref=f1e178]: JB
+              - generic [ref=f1e179]: "03"
+            - heading "Jude Bellingham" [level=3] [ref=f1e180]
+            - paragraph [ref=f1e181]: Real Madrid · Midfield
+            - generic [ref=f1e182]:
+              - generic [ref=f1e183]:
+                - paragraph [ref=f1e184]: APP
+                - paragraph [ref=f1e185]: "30"
+              - generic [ref=f1e186]:
+                - paragraph [ref=f1e187]: GOALS
+                - paragraph [ref=f1e188]: "14"
+              - generic [ref=f1e189]:
+                - paragraph [ref=f1e190]: ASSISTS
+                - paragraph [ref=f1e191]: "9"
+            - generic [ref=f1e192]:
+              - generic [ref=f1e193]: Market value
+              - generic [ref=f1e194]: €160.00M
+          - link "LY 04 Lamine Yamal FC Barcelona · Attack APP 31 GOALS 12 ASSISTS 10 Market value €150.00M" [ref=f1e195] [cursor=pointer]:
+            - /url: /players/4
+            - generic [ref=f1e196]:
+              - generic [ref=f1e197]: LY
+              - generic [ref=f1e198]: "04"
+            - heading "Lamine Yamal" [level=3] [ref=f1e199]
+            - paragraph [ref=f1e200]: FC Barcelona · Attack
+            - generic [ref=f1e201]:
+              - generic [ref=f1e202]:
+                - paragraph [ref=f1e203]: APP
+                - paragraph [ref=f1e204]: "31"
+              - generic [ref=f1e205]:
+                - paragraph [ref=f1e206]: GOALS
+                - paragraph [ref=f1e207]: "12"
+              - generic [ref=f1e208]:
+                - paragraph [ref=f1e209]: ASSISTS
+                - paragraph [ref=f1e210]: "10"
+            - generic [ref=f1e211]:
+              - generic [ref=f1e212]: Market value
+              - generic [ref=f1e213]: €150.00M
+        - generic [ref=f1e214]:
+          - generic [ref=f1e215]: DISPLAYING 1—4 / 50,000+
+          - generic [ref=f1e216]:
+            - button "Previous" [ref=f1e217]
+            - button "Next" [ref=f1e218]
+      - generic [ref=f1e219]:
+        - generic [ref=f1e220]:
+          - paragraph [ref=f1e221]: Historical context
+          - heading "Market distribution" [level=2] [ref=f1e222]
+          - generic [ref=f1e248]:
+            - generic [ref=f1e249]: "2016"
+            - generic [ref=f1e250]: "2020"
+            - generic [ref=f1e251]: "2024"
+            - generic [ref=f1e252]: "2026"
+        - generic [ref=f1e253]:
+          - generic [ref=f1e254]:
+            - generic [ref=f1e255]:
+              - paragraph [ref=f1e256]: Comparison matrix
+              - heading "Edge analysis" [level=2] [ref=f1e257]
+            - link "Open matrix →" [ref=f1e258] [cursor=pointer]:
+              - /url: /compare
+          - generic [ref=f1e259]:
+            - generic [ref=f1e261]:
+              - generic [ref=f1e262]: Attack output
+              - generic [ref=f1e263]: A 86 / B 73
+            - generic [ref=f1e268]:
+              - generic [ref=f1e269]: Value efficiency
+              - generic [ref=f1e270]: A 76 / B 85
+            - generic [ref=f1e275]:
+              - generic [ref=f1e276]: Availability
+              - generic [ref=f1e277]: A 91 / B 67
+            - generic [ref=f1e282]:
+              - generic [ref=f1e283]: Age trajectory
+              - generic [ref=f1e284]: A 88 / B 79

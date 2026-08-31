@@ -1,0 +1,455 @@
+{
+  "player_id": "28003",
+  "player_name": "Lionel Messi",
+  "profile_url": "https://www.transfermarkt.com/lionel-messi/profil/spieler/28003",
+  "jersey_number": "10",
+  "current_club": "Inter Miami CF",
+  "league": {
+    "name": "MLS",
+    "country": "United States",
+    "division": "First Tier"
+  },
+  "arrival_date": "15/07/2023",
+  "contract_end": "31/12/2028",
+  "market_value": "15.00M€",
+  "full_name": "Lionel Andrés Messi Cuccitini",
+  "age": "39",
+  "place_of_birth": "Rosario",
+  "citizenship": "Argentina, Spain",
+  "height": "1,70 m",
+  "position": "Attack - Right Winger",
+  "foot": "left",
+  "agent": "Relatives",
+  "outfitter": "adidas",
+  "last_contract_extension": "23/10/2025",
+  "social_media": [
+    {
+      "type": "Facebook",
+      "url": "http://www.facebook.com/LeoMessi"
+    },
+    {
+      "type": "Instagram",
+      "url": "http://instagram.com/leomessi"
+    },
+    {
+      "type": "Website",
+      "url": "http://www.leomessi.com"
+    }
+  ],
+  "trophies": [
+    {
+      "trophy": "The Best FIFA Men's Player",
+      "count": 4
+    },
+    {
+      "trophy": "Winner Ballon d'Or",
+      "count": 8
+    },
+    {
+      "trophy": "World Cup winner",
+      "count": 1
+    },
+    {
+      "trophy": "Copa América winner",
+      "count": 2
+    },
+    {
+      "trophy": "UEFA Champions League winner",
+      "count": 4
+    }
+  ],
+  "transfer_history": [
+    {
+      "season": "23/24",
+      "date": "2023-07-15",
+      "left": "PSG",
+      "joined": "Miami",
+      "market_value": "€35.00m",
+      "fee": "free transfer"
+    },
+    {
+      "season": "21/22",
+      "date": "2021-08-10",
+      "left": "Barcelona",
+      "joined": "PSG",
+      "market_value": "€80.00m",
+      "fee": "free transfer"
+    },
+    {
+      "season": "05/06",
+      "date": "2005-07-01",
+      "left": "Barcelona B",
+      "joined": "Barcelona",
+      "market_value": "€3.00m",
+      "fee": "-"
+    },
+    {
+      "season": "03/04",
+      "date": "2004-03-05",
+      "left": "Barcelona C",
+      "joined": "Barcelona B",
+      "market_value": "-",
+      "fee": "-"
+    },
+    {
+      "season": "03/04",
+      "date": "2003-11-28",
+      "left": "Barça U19",
+      "joined": "Barcelona C",
+      "market_value": "-",
+      "fee": "-"
+    },
+    {
+      "season": "03/04",
+      "date": "2003-09-13",
+      "left": "Barça U16",
+      "joined": "Barça U19",
+      "market_value": "-",
+      "fee": "-"
+    },
+    {
+      "season": "02/03",
+      "date": "2002-07-01",
+      "left": "Barça Youth",
+      "joined": "Barça U16",
+      "market_value": "-",
+      "fee": "-"
+    },
+    {
+      "season": "00/01",
+      "date": "2000-07-01",
+      "left": "Newell's JV",
+      "joined": "Barça Youth",
+      "market_value": "-",
+      "fee": "free transfer"
+    }
+  ],
+  "season_stats": [
+    {
+      "season": "2025/26",
+      "competitions": [
+        {
+          "competition": "Major League Soccer",
+          "appearances": 19,
+          "goals": 18,
+          "assists": 9,
+          "minutes_played": 1640,
+          "yellow_cards": 3,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "FIFA World Cup",
+          "appearances": 8,
+          "goals": 8,
+          "assists": 4,
+          "minutes_played": 740,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 5,
+          "goals": 3,
+          "assists": 3,
+          "minutes_played": 331,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "CONCACAF Champions Cup",
+          "appearances": 2,
+          "goals": 1,
+          "assists": 0,
+          "minutes_played": 180,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Leagues Cup",
+          "appearances": 2,
+          "goals": 2,
+          "assists": 1,
+          "minutes_played": 135,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2024/25",
+      "competitions": [
+        {
+          "competition": "Major League Soccer",
+          "appearances": 28,
+          "goals": 29,
+          "assists": 16,
+          "minutes_played": 2420,
+          "yellow_cards": 3,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "CONCACAF Champions Cup",
+          "appearances": 7,
+          "goals": 5,
+          "assists": 1,
+          "minutes_played": 556,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "MLS Cup Playoffs",
+          "appearances": 6,
+          "goals": 6,
+          "assists": 7,
+          "minutes_played": 540,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "FIFA Club World Cup",
+          "appearances": 4,
+          "goals": 1,
+          "assists": 0,
+          "minutes_played": 360,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Leagues Cup",
+          "appearances": 4,
+          "goals": 2,
+          "assists": 2,
+          "minutes_played": 281,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 1
+        }
+      ]
+    },
+    {
+      "season": "2023/24",
+      "competitions": [
+        {
+          "competition": "Major League Soccer",
+          "appearances": 19,
+          "goals": 20,
+          "assists": 10,
+          "minutes_played": 1486,
+          "yellow_cards": 2,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "FIFA World Cup Qualifying (CONCACAF)",
+          "appearances": 12,
+          "goals": 8,
+          "assists": 3,
+          "minutes_played": 945,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Copa América",
+          "appearances": 5,
+          "goals": 1,
+          "assists": 1,
+          "minutes_played": 426,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "CONCACAF Champions Cup",
+          "appearances": 3,
+          "goals": 2,
+          "assists": 2,
+          "minutes_played": 230,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "MLS Cup Playoffs",
+          "appearances": 3,
+          "goals": 1,
+          "assists": 1,
+          "minutes_played": 270,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 2,
+          "goals": 2,
+          "assists": 1,
+          "minutes_played": 124,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2022/23",
+      "competitions": [
+        {
+          "competition": "Ligue 1",
+          "appearances": 32,
+          "goals": 16,
+          "assists": 16,
+          "minutes_played": 2842,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 7,
+          "goals": 4,
+          "assists": 4,
+          "minutes_played": 615,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Leagues Cup",
+          "appearances": 7,
+          "goals": 10,
+          "assists": 1,
+          "minutes_played": 594,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 6,
+          "goals": 10,
+          "assists": 2,
+          "minutes_played": 484,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "Major League Soccer",
+          "appearances": 6,
+          "goals": 1,
+          "assists": 2,
+          "minutes_played": 372,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Trophée des Champions",
+          "appearances": 1,
+          "goals": 1,
+          "assists": 0,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Coupe de France",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "US Open Cup",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 2,
+          "minutes_played": 120,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2021/22",
+      "competitions": [
+        {
+          "competition": "Ligue 1",
+          "appearances": 26,
+          "goals": 6,
+          "assists": 15,
+          "minutes_played": 2152,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 7,
+          "goals": 5,
+          "assists": 0,
+          "minutes_played": 630,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 2
+        },
+        {
+          "competition": "FIFA World Cup",
+          "appearances": 7,
+          "goals": 7,
+          "assists": 3,
+          "minutes_played": 690,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 4
+        },
+        {
+          "competition": "Coupe de France",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "CONMEBOL-UEFA Cup of Champions",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 2,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 1,
+          "goals": 5,
+          "assists": 0,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        }
+      ]
+    }
+  ],
+  "last_updated": "2026-08-30 19:40:53"
+}

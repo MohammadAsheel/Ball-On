@@ -1,0 +1,558 @@
+{
+  "player_id": "487469",
+  "player_name": "Vitinha",
+  "profile_url": "https://www.transfermarkt.com/vitinha/profil/spieler/487469",
+  "jersey_number": "17",
+  "current_club": "Paris Saint-Germain",
+  "league": {
+    "name": "Ligue 1",
+    "country": "France",
+    "division": "First Tier"
+  },
+  "arrival_date": "01/07/2022",
+  "contract_end": "30/06/2029",
+  "market_value": "140.00M€",
+  "full_name": "Vitinha",
+  "age": "26",
+  "place_of_birth": "Vila das Aves",
+  "citizenship": "Portugal",
+  "height": "1,70 m",
+  "position": "Midfield - Defensive Midfield",
+  "foot": "right",
+  "agent": "Gestifute",
+  "outfitter": "Nike",
+  "last_contract_extension": "07/02/2025",
+  "social_media": [
+    {
+      "type": "Twitter",
+      "url": "http://twitter.com/vitinha"
+    },
+    {
+      "type": "Facebook",
+      "url": "http://www.facebook.com/VitinhaVitorFerreira"
+    },
+    {
+      "type": "Instagram",
+      "url": "http://www.instagram.com/vitinha/"
+    }
+  ],
+  "trophies": [
+    {
+      "trophy": "UEFA Champions League winner",
+      "count": 2
+    },
+    {
+      "trophy": "French champion",
+      "count": 4
+    },
+    {
+      "trophy": "Uefa Supercup winner",
+      "count": 2
+    },
+    {
+      "trophy": "FIFA Intercontinental Cup Winner",
+      "count": 1
+    },
+    {
+      "trophy": "Winner UEFA Nations League",
+      "count": 1
+    }
+  ],
+  "transfer_history": [
+    {
+      "season": "22/23",
+      "date": "2022-07-01",
+      "left": "Porto",
+      "joined": "PSG",
+      "market_value": "€30.00m",
+      "fee": "€41.50m"
+    },
+    {
+      "season": "20/21",
+      "date": "2021-06-30",
+      "left": "Wolves",
+      "joined": "Porto",
+      "market_value": "€7.00m",
+      "fee": "End of loan"
+    },
+    {
+      "season": "20/21",
+      "date": "2020-09-10",
+      "left": "Porto",
+      "joined": "Wolves",
+      "market_value": "€5.00m",
+      "fee": "loan transfer"
+    },
+    {
+      "season": "19/20",
+      "date": "2020-01-09",
+      "left": "FC Porto B",
+      "joined": "Porto",
+      "market_value": "€1.50m",
+      "fee": "-"
+    },
+    {
+      "season": "19/20",
+      "date": "2019-07-01",
+      "left": "FC Porto U19",
+      "joined": "FC Porto B",
+      "market_value": "-",
+      "fee": "-"
+    },
+    {
+      "season": "17/18",
+      "date": "2017-07-01",
+      "left": "FC Porto U17",
+      "joined": "FC Porto U19",
+      "market_value": "-",
+      "fee": "-"
+    },
+    {
+      "season": "16/17",
+      "date": "2016-07-01",
+      "left": "Padroense U17",
+      "joined": "FC Porto U17",
+      "market_value": "-",
+      "fee": "-"
+    },
+    {
+      "season": "15/16",
+      "date": "2015-07-01",
+      "left": "FC Porto U15",
+      "joined": "Padroense U17",
+      "market_value": "-",
+      "fee": "-"
+    },
+    {
+      "season": "13/14",
+      "date": "2013-07-01",
+      "left": "FC Porto Youth",
+      "joined": "FC Porto U15",
+      "market_value": "-",
+      "fee": "-"
+    }
+  ],
+  "season_stats": [
+    {
+      "season": "2026/27",
+      "competitions": [
+        {
+          "competition": "Ligue 1",
+          "appearances": 2,
+          "goals": 1,
+          "assists": 1,
+          "minutes_played": 159,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Super Cup",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Trophée des Champions",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2025/26",
+      "competitions": [
+        {
+          "competition": "Ligue 1",
+          "appearances": 29,
+          "goals": 1,
+          "assists": 7,
+          "minutes_played": 2121,
+          "yellow_cards": 2,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 17,
+          "goals": 6,
+          "assists": 1,
+          "minutes_played": 1545,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "FIFA World Cup",
+          "appearances": 5,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 381,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 3,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 135,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "FIFA Intercontinental Cup",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 120,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Coupe de France",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Trophée des Champions",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 1,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Super Cup",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 1,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2024/25",
+      "competitions": [
+        {
+          "competition": "Ligue 1",
+          "appearances": 29,
+          "goals": 5,
+          "assists": 1,
+          "minutes_played": 2035,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 2
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 17,
+          "goals": 2,
+          "assists": 2,
+          "minutes_played": 1448,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "FIFA Club World Cup",
+          "appearances": 7,
+          "goals": 1,
+          "assists": 2,
+          "minutes_played": 630,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "FIFA World Cup Qualifying (Europe)",
+          "appearances": 6,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 485,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Coupe de France",
+          "appearances": 5,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 318,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Nations League Finals",
+          "appearances": 4,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 341,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Nations League A",
+          "appearances": 4,
+          "goals": 0,
+          "assists": 3,
+          "minutes_played": 313,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Trophée des Champions",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2023/24",
+      "competitions": [
+        {
+          "competition": "Ligue 1",
+          "appearances": 28,
+          "goals": 7,
+          "assists": 4,
+          "minutes_played": 2129,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 12,
+          "goals": 2,
+          "assists": 1,
+          "minutes_played": 914,
+          "yellow_cards": 2,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Coupe de France",
+          "appearances": 5,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 427,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Euro",
+          "appearances": 4,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 362,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 3,
+          "goals": 0,
+          "assists": 1,
+          "minutes_played": 264,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Trophée des Champions",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 90,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2022/23",
+      "competitions": [
+        {
+          "competition": "Ligue 1",
+          "appearances": 36,
+          "goals": 2,
+          "assists": 3,
+          "minutes_played": 2460,
+          "yellow_cards": 3,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 8,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 589,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Euro Qualifying",
+          "appearances": 6,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 130,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Coupe de France",
+          "appearances": 3,
+          "goals": 0,
+          "assists": 1,
+          "minutes_played": 243,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Nations League A",
+          "appearances": 3,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 95,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 45,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Trophée des Champions",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 68,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2021/22",
+      "competitions": [
+        {
+          "competition": "Primeira Liga",
+          "appearances": 30,
+          "goals": 2,
+          "assists": 4,
+          "minutes_played": 2266,
+          "yellow_cards": 3,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Taça de Portugal",
+          "appearances": 7,
+          "goals": 2,
+          "assists": 1,
+          "minutes_played": 561,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 6,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 217,
+          "yellow_cards": 2,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Euro Under-21 qualification",
+          "appearances": 5,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 377,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Europa League",
+          "appearances": 4,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 224,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "FIFA World Cup",
+          "appearances": 3,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 118,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "World Cup Qualification Playoffs",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 1,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    }
+  ],
+  "last_updated": "2026-08-31 09:03:59"
+}

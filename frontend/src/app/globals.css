@@ -1,0 +1,227 @@
+@import "tailwindcss";
+
+:root {
+  --bg-main: #080808;
+  --bg-surface: #0e0e0e;
+  --bg-card: #141414;
+  --bg-card-hover: #191919;
+  --border-color: #292929;
+
+  --primary: #00f2fe;
+  --primary-dim: #00aab3;
+  --emerald: #10b981;
+  --amber: #f59e0b;
+  --violet: #b9b9b9;
+  --rose: #ef6a6a;
+
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-main);
+  background-image: linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-attachment: fixed;
+  color: var(--text-main);
+  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Cards ──────────────────────────────────────────────── */
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  padding: 1.25rem;
+  transition: border-color 0.2s ease;
+}
+
+.glass-card:hover {
+  border-color: #414141;
+}
+
+/* ─── Badges ─────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.badge-blue {
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.badge-green {
+  background: rgba(16, 185, 129, 0.1);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.badge-amber {
+  background: rgba(245, 158, 11, 0.1);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.badge-purple {
+  background: rgba(139, 92, 246, 0.1);
+  color: #c084fc;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ─── Inputs ─────────────────────────────────────────────── */
+input, select, textarea {
+  background: #101010;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.9rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+}
+
+/* Keep native range controls lean; the text-field treatment above is not
+   appropriate for a slider track. */
+input[type='range'] {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* ─── Tables ─────────────────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+th {
+  background: rgba(12, 18, 32, 0.9);
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 0.875rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+}
+
+td {
+  padding: 0.75rem 0.875rem;
+  font-size: 0.875rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: var(--text-main);
+}
+
+tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ─── Buttons ────────────────────────────────────────────── */
+.btn-primary {
+  background: #f0f0f0;
+  color: #080808;
+  font-weight: 600;
+  border: none;
+  border-radius: 2px;
+  padding: 0.55rem 1.1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  transition: filter 0.2s ease, transform 0.15s ease;
+  box-shadow: none;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  padding: 0.55rem 1.1rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background 0.2s ease;
+}
+
+.display-font { font-family: Georgia, 'Times New Roman', serif; }
+.mono-font { font-family: 'Courier New', monospace; font-variant-numeric: tabular-nums; }
+.editorial-kicker { font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: #888; }
+.terminal-card { background: #141414; border: 1px solid #292929; }
+.terminal-card:hover { border-color: #484848; }
+.metric-rule { border-left: 1px solid #292929; }
+.range-control { accent-color: #00f2fe; width: 100%; height: 3px; cursor: pointer; }
+.table-row { border-bottom: 1px solid #242424; transition: background .2s ease; }
+.table-row:hover { background: #1a1a1a; }
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Page Grid (Overview two-column) ────────────────────── */
+.page-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .page-grid {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+}

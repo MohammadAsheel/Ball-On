@@ -1,0 +1,88 @@
+# ──────────────────────────────────────────────
+# Python
+# ──────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# ──────────────────────────────────────────────
+# Environment & Secrets
+# ──────────────────────────────────────────────
+.env
+*.key
+*.pem
+.env*.local
+
+# ──────────────────────────────────────────────
+# Node / Frontend
+# ──────────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+.next/
+frontend/.next/
+out/
+frontend/out/
+.turbo/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ──────────────────────────────────────────────
+# Data (raw data can be large; re-download via script)
+# ──────────────────────────────────────────────
+data/raw/*.csv
+data/raw/*.csv.gz
+data/raw/*.zip
+data/processed/*.csv
+data/processed/*.parquet
+data/features/*.csv
+data/features/*.parquet
+data/external/*.csv
+data/external/*.json
+
+# ──────────────────────────────────────────────
+# Database
+# ──────────────────────────────────────────────
+db/*.db
+db/*.sqlite
+db/*.sqlite3
+
+# ──────────────────────────────────────────────
+# Trained Models (can be large; retrain via script)
+# ──────────────────────────────────────────────
+models/*.joblib
+models/*.pkl
+models/*.json
+
+# ──────────────────────────────────────────────
+# Notebooks
+# ──────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ──────────────────────────────────────────────
+# IDE
+# ──────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ──────────────────────────────────────────────
+# OS
+# ──────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
