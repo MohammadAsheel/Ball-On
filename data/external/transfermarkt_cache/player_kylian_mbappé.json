@@ -1,0 +1,490 @@
+{
+  "player_id": "342229",
+  "player_name": "Kylian Mbappé",
+  "profile_url": "https://www.transfermarkt.com/kylian-mbappe/profil/spieler/342229",
+  "jersey_number": "10",
+  "current_club": "Real Madrid",
+  "league": {
+    "name": "LaLiga",
+    "country": "Spain",
+    "division": "First Tier"
+  },
+  "arrival_date": "01/07/2024",
+  "contract_end": "30/06/2029",
+  "market_value": "200.00M€",
+  "full_name": "Kylian Mbappé Lottin",
+  "age": "27",
+  "place_of_birth": "Paris",
+  "citizenship": "France, Cameroon",
+  "height": "1,80 m",
+  "position": "Attack - Centre-Forward",
+  "foot": "right",
+  "agent": "Relatives",
+  "outfitter": "Nike",
+  "last_contract_extension": null,
+  "social_media": [
+    {
+      "type": "Twitter",
+      "url": "http://twitter.com/KMbappe"
+    },
+    {
+      "type": "Facebook",
+      "url": "http://www.facebook.com/kylianmbappeofficiel/"
+    },
+    {
+      "type": "Instagram",
+      "url": "http://www.instagram.com/k.mbappe/"
+    }
+  ],
+  "trophies": [
+    {
+      "trophy": "Golden Boot winner (Europe)",
+      "count": 1
+    },
+    {
+      "trophy": "Footballer of the Year",
+      "count": 3
+    },
+    {
+      "trophy": "World Cup winner",
+      "count": 1
+    },
+    {
+      "trophy": "French champion",
+      "count": 7
+    },
+    {
+      "trophy": "Uefa Supercup winner",
+      "count": 1
+    }
+  ],
+  "transfer_history": [
+    {
+      "season": "24/25",
+      "date": "2024-07-01",
+      "left": "PSG",
+      "joined": "Real Madrid",
+      "market_value": "€180.00m",
+      "fee": "free transfer"
+    },
+    {
+      "season": "18/19",
+      "date": "2018-07-01",
+      "left": "Monaco",
+      "joined": "PSG",
+      "market_value": "€120.00m",
+      "fee": "€180.00m"
+    },
+    {
+      "season": "17/18",
+      "date": "2018-06-30",
+      "left": "PSG",
+      "joined": "Monaco",
+      "market_value": "€120.00m",
+      "fee": "End of loan"
+    },
+    {
+      "season": "17/18",
+      "date": "2017-08-31",
+      "left": "Monaco",
+      "joined": "PSG",
+      "market_value": "€35.00m",
+      "fee": "loan transfer"
+    },
+    {
+      "season": "15/16",
+      "date": "2016-01-01",
+      "left": "Monaco U19",
+      "joined": "Monaco",
+      "market_value": "€50k",
+      "fee": "-"
+    },
+    {
+      "season": "15/16",
+      "date": "2015-07-01",
+      "left": "Monaco Youth",
+      "joined": "Monaco U19",
+      "market_value": "-",
+      "fee": "-"
+    },
+    {
+      "season": "13/14",
+      "date": "2013-07-01",
+      "left": "Clairef. Yth.",
+      "joined": "Monaco Youth",
+      "market_value": "-",
+      "fee": "free transfer"
+    },
+    {
+      "season": "11/12",
+      "date": "2011-09-01",
+      "left": "AS Bondy Yth.",
+      "joined": "Clairef. Yth.",
+      "market_value": "-",
+      "fee": "free transfer"
+    }
+  ],
+  "season_stats": [
+    {
+      "season": "2026/27",
+      "competitions": [
+        {
+          "competition": "La Liga",
+          "appearances": 3,
+          "goals": 4,
+          "assists": 0,
+          "minutes_played": 270,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2025/26",
+      "competitions": [
+        {
+          "competition": "La Liga",
+          "appearances": 31,
+          "goals": 25,
+          "assists": 5,
+          "minutes_played": 2606,
+          "yellow_cards": 3,
+          "red_cards": 0,
+          "penalty_goals": 8
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 11,
+          "goals": 15,
+          "assists": 1,
+          "minutes_played": 911,
+          "yellow_cards": 2,
+          "red_cards": 0,
+          "penalty_goals": 3
+        },
+        {
+          "competition": "FIFA World Cup",
+          "appearances": 8,
+          "goals": 10,
+          "assists": 4,
+          "minutes_played": 699,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 4,
+          "goals": 1,
+          "assists": 0,
+          "minutes_played": 213,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Supercopa",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 14,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Copa del Rey",
+          "appearances": 1,
+          "goals": 2,
+          "assists": 1,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        }
+      ]
+    },
+    {
+      "season": "2024/25",
+      "competitions": [
+        {
+          "competition": "La Liga",
+          "appearances": 34,
+          "goals": 31,
+          "assists": 3,
+          "minutes_played": 2917,
+          "yellow_cards": 3,
+          "red_cards": 1,
+          "penalty_goals": 7
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 14,
+          "goals": 7,
+          "assists": 1,
+          "minutes_played": 1133,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Nations League Finals",
+          "appearances": 4,
+          "goals": 2,
+          "assists": 2,
+          "minutes_played": 390,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "FIFA World Cup Qualifying (Europe)",
+          "appearances": 4,
+          "goals": 5,
+          "assists": 3,
+          "minutes_played": 353,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 2
+        },
+        {
+          "competition": "Copa del Rey",
+          "appearances": 4,
+          "goals": 2,
+          "assists": 0,
+          "minutes_played": 234,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "FIFA Club World Cup",
+          "appearances": 3,
+          "goals": 1,
+          "assists": 0,
+          "minutes_played": 135,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Supercopa",
+          "appearances": 2,
+          "goals": 1,
+          "assists": 0,
+          "minutes_played": 180,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Nations League A",
+          "appearances": 2,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 113,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "FIFA Intercontinental Cup",
+          "appearances": 1,
+          "goals": 1,
+          "assists": 1,
+          "minutes_played": 62,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Super Cup",
+          "appearances": 1,
+          "goals": 1,
+          "assists": 0,
+          "minutes_played": 83,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2023/24",
+      "competitions": [
+        {
+          "competition": "Ligue 1",
+          "appearances": 29,
+          "goals": 27,
+          "assists": 7,
+          "minutes_played": 2159,
+          "yellow_cards": 4,
+          "red_cards": 0,
+          "penalty_goals": 6
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 12,
+          "goals": 8,
+          "assists": 0,
+          "minutes_played": 1080,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 3
+        },
+        {
+          "competition": "Coupe de France",
+          "appearances": 6,
+          "goals": 8,
+          "assists": 3,
+          "minutes_played": 540,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 5,
+          "goals": 2,
+          "assists": 4,
+          "minutes_played": 373,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "UEFA Euro",
+          "appearances": 5,
+          "goals": 1,
+          "assists": 2,
+          "minutes_played": 465,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "Trophée des Champions",
+          "appearances": 1,
+          "goals": 1,
+          "assists": 0,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2022/23",
+      "competitions": [
+        {
+          "competition": "Ligue 1",
+          "appearances": 34,
+          "goals": 29,
+          "assists": 6,
+          "minutes_played": 2822,
+          "yellow_cards": 6,
+          "red_cards": 0,
+          "penalty_goals": 3
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 8,
+          "goals": 7,
+          "assists": 3,
+          "minutes_played": 652,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "UEFA Euro Qualifying",
+          "appearances": 8,
+          "goals": 9,
+          "assists": 6,
+          "minutes_played": 656,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 3
+        },
+        {
+          "competition": "UEFA Nations League A",
+          "appearances": 5,
+          "goals": 2,
+          "assists": 0,
+          "minutes_played": 342,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Coupe de France",
+          "appearances": 1,
+          "goals": 5,
+          "assists": 1,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2021/22",
+      "competitions": [
+        {
+          "competition": "Ligue 1",
+          "appearances": 35,
+          "goals": 28,
+          "assists": 19,
+          "minutes_played": 3032,
+          "yellow_cards": 10,
+          "red_cards": 0,
+          "penalty_goals": 4
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 8,
+          "goals": 6,
+          "assists": 6,
+          "minutes_played": 674,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "FIFA World Cup",
+          "appearances": 7,
+          "goals": 8,
+          "assists": 2,
+          "minutes_played": 597,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 2
+        },
+        {
+          "competition": "Coupe de France",
+          "appearances": 3,
+          "goals": 5,
+          "assists": 1,
+          "minutes_played": 206,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 1,
+          "goals": 2,
+          "assists": 1,
+          "minutes_played": 90,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        }
+      ]
+    }
+  ],
+  "last_updated": "2026-08-31 11:54:53"
+}

@@ -1,0 +1,434 @@
+{
+  "player_id": "937958",
+  "player_name": "Lamine Yamal",
+  "profile_url": "https://www.transfermarkt.com/lamine-yamal/profil/spieler/937958",
+  "jersey_number": "10",
+  "current_club": "FC Barcelona",
+  "league": {
+    "name": "LaLiga",
+    "country": "Spain",
+    "division": "First Tier"
+  },
+  "arrival_date": "01/07/2023",
+  "contract_end": "30/06/2031",
+  "market_value": "220.00M€",
+  "full_name": "Lamine Yamal",
+  "age": "19",
+  "place_of_birth": "Esplugues de Llobregat",
+  "citizenship": "Spain",
+  "height": "1,83 m",
+  "position": "Attack - Right Winger",
+  "foot": "left",
+  "agent": "Gestifute",
+  "outfitter": "adidas",
+  "last_contract_extension": "27/05/2025",
+  "social_media": [
+    {
+      "type": "Instagram",
+      "url": "http://instagram.com/lamineyamal"
+    },
+    {
+      "type": "TikTok",
+      "url": "http://www.tiktok.com/@lamine.yamal"
+    }
+  ],
+  "trophies": [
+    {
+      "trophy": "Top goal scorer",
+      "count": 2
+    },
+    {
+      "trophy": "TM-Player of the season",
+      "count": 2
+    },
+    {
+      "trophy": "World Cup winner",
+      "count": 1
+    },
+    {
+      "trophy": "European champion",
+      "count": 1
+    },
+    {
+      "trophy": "Spanish champion",
+      "count": 3
+    }
+  ],
+  "transfer_history": [
+    {
+      "season": "23/24",
+      "date": "2023-07-01",
+      "left": "Barça U19",
+      "joined": "Barcelona",
+      "market_value": "-",
+      "fee": "-"
+    },
+    {
+      "season": "22/23",
+      "date": "2022-07-01",
+      "left": "Barça U16",
+      "joined": "Barça U19",
+      "market_value": "-",
+      "fee": "-"
+    },
+    {
+      "season": "21/22",
+      "date": "2021-07-01",
+      "left": "Barça Youth",
+      "joined": "Barça U16",
+      "market_value": "-",
+      "fee": "-"
+    },
+    {
+      "season": "14/15",
+      "date": "2014-07-01",
+      "left": "Torreta Yth.",
+      "joined": "Barça Youth",
+      "market_value": "-",
+      "fee": "free transfer"
+    }
+  ],
+  "season_stats": [
+    {
+      "season": "2026/27",
+      "competitions": [
+        {
+          "competition": "La Liga",
+          "appearances": 2,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 155,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2025/26",
+      "competitions": [
+        {
+          "competition": "La Liga",
+          "appearances": 28,
+          "goals": 16,
+          "assists": 12,
+          "minutes_played": 2270,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 3
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 10,
+          "goals": 6,
+          "assists": 4,
+          "minutes_played": 874,
+          "yellow_cards": 4,
+          "red_cards": 0,
+          "penalty_goals": 3
+        },
+        {
+          "competition": "FIFA World Cup",
+          "appearances": 8,
+          "goals": 1,
+          "assists": 1,
+          "minutes_played": 615,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Copa del Rey",
+          "appearances": 5,
+          "goals": 2,
+          "assists": 2,
+          "minutes_played": 450,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Supercopa",
+          "appearances": 2,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 108,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 2,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 108,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2024/25",
+      "competitions": [
+        {
+          "competition": "La Liga",
+          "appearances": 35,
+          "goals": 9,
+          "assists": 15,
+          "minutes_played": 2864,
+          "yellow_cards": 3,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 13,
+          "goals": 5,
+          "assists": 4,
+          "minutes_played": 1103,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Copa del Rey",
+          "appearances": 5,
+          "goals": 2,
+          "assists": 6,
+          "minutes_played": 464,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Nations League Finals",
+          "appearances": 4,
+          "goals": 3,
+          "assists": 0,
+          "minutes_played": 381,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "UEFA Nations League A",
+          "appearances": 3,
+          "goals": 0,
+          "assists": 1,
+          "minutes_played": 225,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Supercopa",
+          "appearances": 2,
+          "goals": 2,
+          "assists": 0,
+          "minutes_played": 122,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "FIFA World Cup Qualifying (Europe)",
+          "appearances": 2,
+          "goals": 0,
+          "assists": 3,
+          "minutes_played": 152,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2023/24",
+      "competitions": [
+        {
+          "competition": "La Liga",
+          "appearances": 37,
+          "goals": 5,
+          "assists": 7,
+          "minutes_played": 2196,
+          "yellow_cards": 3,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Champions League",
+          "appearances": 10,
+          "goals": 0,
+          "assists": 2,
+          "minutes_played": 579,
+          "yellow_cards": 2,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Euro",
+          "appearances": 7,
+          "goals": 1,
+          "assists": 4,
+          "minutes_played": 508,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 3,
+          "goals": 0,
+          "assists": 4,
+          "minutes_played": 180,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Supercopa",
+          "appearances": 2,
+          "goals": 1,
+          "assists": 0,
+          "minutes_played": 77,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Copa del Rey",
+          "appearances": 1,
+          "goals": 1,
+          "assists": 0,
+          "minutes_played": 105,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2022/23",
+      "competitions": [
+        {
+          "competition": "UEFA Youth League",
+          "appearances": 6,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 245,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "UEFA Under-17 Euro",
+          "appearances": 5,
+          "goals": 4,
+          "assists": 2,
+          "minutes_played": 447,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "UEFA Euro Qualifying",
+          "appearances": 4,
+          "goals": 2,
+          "assists": 0,
+          "minutes_played": 205,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "U17 Algarve Tournament",
+          "appearances": 3,
+          "goals": 3,
+          "assists": 0,
+          "minutes_played": 190,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "Promoción de ascenso a LaLiga2 ",
+          "appearances": 2,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 29,
+          "yellow_cards": 1,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 2,
+          "goals": 1,
+          "assists": 1,
+          "minutes_played": 180,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 1
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 23,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "Primera Federación - Grupo II",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 23,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "La Liga",
+          "appearances": 1,
+          "goals": 0,
+          "assists": 0,
+          "minutes_played": 7,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    },
+    {
+      "season": "2021/22",
+      "competitions": [
+        {
+          "competition": "International Friendlies",
+          "appearances": 6,
+          "goals": 3,
+          "assists": 2,
+          "minutes_played": 287,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        },
+        {
+          "competition": "International Friendlies",
+          "appearances": 4,
+          "goals": 1,
+          "assists": 0,
+          "minutes_played": 180,
+          "yellow_cards": 0,
+          "red_cards": 0,
+          "penalty_goals": 0
+        }
+      ]
+    }
+  ],
+  "last_updated": "2026-08-31 11:36:30"
+}

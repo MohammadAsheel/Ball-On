@@ -38,6 +38,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.tsbuildinfo
+frontend/*.tsbuildinfo
 
 # ──────────────────────────────────────────────
 # Data (raw data can be large; re-download via script)

@@ -1,12 +1,19 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Search, User, ArrowRight, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, X, Users, Sparkles } from 'lucide-react';
 import { api } from '@/lib/api';
 import { PlayerSearchItem } from '@/lib/types';
-import { formatEUR } from '@/lib/format';
 import { CardSkeleton } from '@/components/ui/Skeleton';
+import PlayerCard from '@/components/ui/PlayerCard';
+
+const positions = [
+  { label: 'All Positions', value: '' },
+  { label: 'Attackers', value: 'Attack' },
+  { label: 'Midfielders', value: 'Midfield' },
+  { label: 'Defenders', value: 'Defender' },
+  { label: 'Goalkeepers', value: 'Goalkeeper' },
+];
 
 export default function PlayersDirectoryPage() {
   const [query, setQuery] = useState('');
@@ -44,47 +51,80 @@ export default function PlayersDirectoryPage() {
   }, [query, position, page]);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-7 pb-10">
+      {/* Header Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-white/[0.08] pb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Players</h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Search and explore over 50,000 players across top European leagues.
+          <div className="flex items-center gap-2 mb-2">
+            <span className="editorial-kicker text-cyan-400">Database Directory</span>
+            <span className="h-1 w-1 rounded-full bg-slate-600" />
+            <span className="mono-font text-[10px] text-emerald-400">INDEXED & LIVE</span>
+          </div>
+          <h1 className="display-font text-3xl sm:text-4xl font-bold text-white tracking-tight">
+            Player Intelligence Catalog
+          </h1>
+          <p className="text-sm text-slate-400 mt-1.5 max-w-2xl">
+            Explore and evaluate over 50,000 professional players with real-time valuation metrics, performance telemetry, and machine-learning transfer estimates.
           </p>
         </div>
-        <span className="text-xs text-slate-500 font-medium tabular-nums">{totalCount.toLocaleString()} players</span>
+        <div className="flex items-center gap-2 self-start sm:self-auto rounded-xl border border-white/[0.08] bg-white/[0.03] px-3.5 py-2">
+          <Users size={15} className="text-cyan-400" />
+          <span className="mono-font text-xs text-slate-300 font-semibold tabular-nums">
+            {totalCount.toLocaleString()} <span className="text-slate-500">records</span>
+          </span>
+        </div>
       </div>
 
-      {/* Search & Filter Bar */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+      {/* Search & Position Filters */}
+      <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+        {/* Search input */}
+        <div className="relative flex-1 max-w-xl">
           <input
             type="text"
-            placeholder="Search player name..."
+            placeholder="Search player by name (e.g. Haaland, Yamal, Vinicius)…"
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
               setPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2.5 text-sm"
+            className="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-white/[0.1] bg-[#0e121a]/90 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
           />
-          <Search className="absolute left-3.5 top-3 text-slate-500" size={16} />
+          <Search className="absolute left-3.5 top-3 text-slate-400" size={16} />
+          {query && (
+            <button
+              onClick={() => {
+                setQuery('');
+                setPage(1);
+              }}
+              className="absolute right-3.5 top-3 text-slate-400 hover:text-white"
+            >
+              <X size={16} />
+            </button>
+          )}
         </div>
-        <select
-          value={position}
-          onChange={(e) => {
-            setPosition(e.target.value);
-            setPage(1);
-          }}
-          className="w-full sm:w-44 px-3 py-2.5 text-sm"
-        >
-          <option value="">All Positions</option>
-          <option value="Attack">Attackers</option>
-          <option value="Midfield">Midfielders</option>
-          <option value="Defender">Defenders</option>
-          <option value="Goalkeeper">Goalkeepers</option>
-        </select>
+
+        {/* Filter Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+          {positions.map((p) => {
+            const active = position === p.value;
+            return (
+              <button
+                key={p.value}
+                onClick={() => {
+                  setPosition(p.value);
+                  setPage(1);
+                }}
+                className={`whitespace-nowrap rounded-xl px-3.5 py-2 text-xs font-semibold tracking-wide transition-all ${
+                  active
+                    ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/40 shadow-[0_0_15px_rgba(0,242,254,0.15)]'
+                    : 'bg-white/[0.03] text-slate-400 border border-white/[0.06] hover:border-white/[0.15] hover:text-white'
+                }`}
+              >
+                {p.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Players Grid */}
@@ -95,79 +135,47 @@ export default function PlayersDirectoryPage() {
           ))}
         </div>
       ) : players.length === 0 ? (
-        <div className="glass-card text-center py-16 text-slate-400">
-          <p className="font-semibold text-white">No players found</p>
-          <p className="text-xs mt-1">Try adjusting your search keywords or filter criteria.</p>
+        <div className="glass-card text-center py-20 text-slate-400 rounded-2xl border border-white/[0.08]">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/[0.05] text-slate-400">
+            <Search size={22} />
+          </div>
+          <p className="text-base font-bold text-white">No players found</p>
+          <p className="text-xs mt-1 text-slate-400">Try adjusting your search query or selecting a different position filter.</p>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {players.map((p) => (
-              <Link
-                key={p.player_id}
-                href={`/players/${p.player_id}`}
-                className="glass-card p-5 border border-white/5 hover:border-sky-500/30 hover:bg-slate-900/90 transition-all group flex flex-col justify-between"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="w-10 h-10 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-slate-400 overflow-hidden">
-                      {p.image_url ? (
-                        <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <User size={20} />
-                      )}
-                    </div>
-                    {p.position && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                        {p.position}
-                      </span>
-                    )}
-                  </div>
-
-                  <div>
-                    <h3 className="text-base font-bold text-white group-hover:text-sky-400 transition-colors line-clamp-1">
-                      {p.name}
-                    </h3>
-                    <p className="text-xs text-slate-400 line-clamp-1">
-                      {p.current_club_name || 'Free Agent'}
-                    </p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
-                      {p.country_of_citizenship || 'Unknown'} {p.age ? `• ${p.age} yrs` : ''}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-white/5 flex items-center justify-between mt-4">
-                  <div>
-                    <p className="text-[10px] text-slate-500 font-semibold uppercase">Market Valuation</p>
-                    <p className="text-xs font-bold text-emerald-400">
-                      {p.market_value_in_eur ? formatEUR(p.market_value_in_eur) : 'Not available'}
-                    </p>
-                  </div>
-                  <ArrowRight size={14} className="text-slate-500 group-hover:text-sky-400 group-hover:translate-x-1 transition-all" />
-                </div>
-              </Link>
+              <PlayerCard key={p.player_id} player={p} />
             ))}
           </div>
 
           {/* Pagination */}
           {!query && totalCount > 24 && (
-            <div className="flex items-center justify-center gap-3 pt-6">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="btn-secondary py-1.5 px-3 text-xs disabled:opacity-40 flex items-center gap-1"
-              >
-                <ChevronLeft size={14} /> Previous
-              </button>
-              <span className="text-xs text-slate-400 font-semibold">Page {page}</span>
-              <button
-                onClick={() => setPage((p) => p + 1)}
-                disabled={page * 24 >= totalCount}
-                className="btn-secondary py-1.5 px-3 text-xs disabled:opacity-40 flex items-center gap-1"
-              >
-                Next <ChevronRight size={14} />
-              </button>
+            <div className="flex items-center justify-between border-t border-white/[0.08] pt-6">
+              <span className="mono-font text-xs text-slate-500">
+                Displaying {(page - 1) * 24 + 1}–{Math.min(page * 24, totalCount)} of {totalCount.toLocaleString()} records
+              </span>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="btn-secondary py-2 px-3.5 text-xs rounded-xl disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5"
+                >
+                  <ChevronLeft size={14} /> Previous
+                </button>
+                <span className="mono-font rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-slate-300 font-semibold">
+                  {page} / {Math.ceil(totalCount / 24)}
+                </span>
+                <button
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={page * 24 >= totalCount}
+                  className="btn-secondary py-2 px-3.5 text-xs rounded-xl disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5"
+                >
+                  Next <ChevronRight size={14} />
+                </button>
+              </div>
             </div>
           )}
         </>
