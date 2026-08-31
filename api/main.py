@@ -12,6 +12,7 @@ from api.routes.transfers import router as transfers_router
 from api.routes.estimator import router as estimator_router
 from api.routes.clubs import router as clubs_router
 from api.routes.live import router as live_router
+from api.routes.news import router as news_router
 
 app = FastAPI(
     title="BALLON API",
@@ -35,6 +36,7 @@ app.include_router(transfers_router)
 app.include_router(estimator_router)
 app.include_router(clubs_router)
 app.include_router(live_router)
+app.include_router(news_router)
 
 
 @app.get("/")

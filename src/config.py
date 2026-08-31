@@ -80,10 +80,11 @@ TRANSFERMARKT_MVP_FILES = [
 # ──────────────────────────────────────────────
 # External APIs
 # ──────────────────────────────────────────────
-# 1. API-Football (RapidAPI)
+# 1. API-Football / API-Sports (Direct & RapidAPI)
+API_FOOTBALL_KEY = os.getenv("API_FOOTBALL_KEY", "")
 RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY", "")
 RAPIDAPI_HOST = os.getenv("RAPIDAPI_HOST", "api-football-v1.p.rapidapi.com")
-API_FOOTBALL_BASE_URL = f"https://{RAPIDAPI_HOST}"
+API_FOOTBALL_BASE_URL = os.getenv("API_FOOTBALL_BASE_URL", "https://v3.football.api-sports.io")
 
 # 2. Football-Data.org
 FOOTBALL_DATA_ORG_API_KEY = os.getenv("FOOTBALL_DATA_ORG_API_KEY", "")
@@ -98,6 +99,10 @@ TRANSFERMARKT_API_KEY = os.getenv("TRANSFERMRKT_API_KEY", os.getenv("TRANSFERMAR
 TRANSFERMARKT_ACTOR_ID = os.getenv("TRANSFERMARKT_ACTOR_ID", "data_xplorer~transfermarkt-api-scraper")
 TRANSFERMARKT_CACHE_DIR = EXTERNAL_DATA_DIR / "transfermarkt_cache"
 TRANSFERMARKT_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+# 5. BigBallsData SDK / REST API
+BIGBALLSDATA_API_KEY = os.getenv("BIGBALLSDATA_API_KEY", "bbs_live_00000VmNNihAMTZrBtg9eeFAhmhOfglQbOiRePZHVs3yDk21")
+BIGBALLSDATA_BASE_URL = "https://api.bigballsdata.com/v1/matches"
 
 # ──────────────────────────────────────────────
 # ML Constants
