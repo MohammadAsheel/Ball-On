@@ -110,6 +110,3 @@ backend/db/*.db
 
 # Generated ML model binaries
 backend/models/*.joblib
-
-
-
