@@ -42,7 +42,8 @@ for directory in [
 # Database
 # ──────────────────────────────────────────────
 DATABASE_PATH = DB_DIR / "football_transfers.db"
-DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{DATABASE_PATH}")
+DATABASE_URL = os.getenv("DATABASE_URL")
+
 
 # ──────────────────────────────────────────────
 # Data Source URLs
@@ -101,8 +102,8 @@ TRANSFERMARKT_CACHE_DIR = EXTERNAL_DATA_DIR / "transfermarkt_cache"
 TRANSFERMARKT_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 # 5. BigBallsData SDK / REST API
-BIGBALLSDATA_API_KEY = os.getenv("BIGBALLSDATA_API_KEY", "bbs_live_00000VmNNihAMTZrBtg9eeFAhmhOfglQbOiRePZHVs3yDk21")
 BIGBALLSDATA_BASE_URL = "https://api.bigballsdata.com/v1/matches"
+BIGBALLSDATA_API_KEY = os.getenv("BIGBALLSDATA_API_KEY", "")
 
 # ──────────────────────────────────────────────
 # ML Constants

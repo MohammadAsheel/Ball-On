@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import sqlite3
 from datetime import date, datetime, timezone
 from typing import Any
 
@@ -19,7 +18,8 @@ from sklearn.metrics import mean_absolute_error, median_absolute_error, mean_squ
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from src.config import DATABASE_PATH, MODEL_DIR, RANDOM_SEED, TRAIN_TEST_SPLIT_DATE
+from src.config import MODEL_DIR, RANDOM_SEED, TRAIN_TEST_SPLIT_DATE
+from src.database import SessionLocal
 from src.models.wrappers import LogTargetRegressor
 from src.valuation.data_snapshot import FEATURE_COLUMNS, MARKET_FEATURE_COLUMNS, load_paid_transfer_snapshots
 from src.valuation.registry import register_model
@@ -58,8 +58,8 @@ def _split(frame: pd.DataFrame):
 def train_and_evaluate_all(as_of_date: str | None = None) -> dict[str, Any]:
     """Train candidates using snapshots known before each transfer date."""
     as_of_date = as_of_date or date.today().isoformat()
-    with sqlite3.connect(str(DATABASE_PATH)) as conn:
-        frame = load_paid_transfer_snapshots(conn, as_of_date)
+    with SessionLocal() as session:
+        frame = load_paid_transfer_snapshots(session, as_of_date)
     frame = frame.dropna(subset=["transfer_fee", "transfer_date", "age_at_transfer"])
     train, validation, test = _split(frame)
     if min(len(train), len(validation), len(test)) < 2:
@@ -101,7 +101,7 @@ def train_and_evaluate_all(as_of_date: str | None = None) -> dict[str, Any]:
     metadata: dict[str, Any] = {
         "model_version": MODEL_VERSION,
         "training_date": datetime.now(timezone.utc).isoformat(),
-        "dataset_version": "transfermarkt-sqlite-source",
+        "dataset_version": "transfermarkt-postgres-source",
         "as_of_date": as_of_date,
         "transfer_type_limitation": "The source transfers table has no transfer_type column. Training rows are known positive-fee paid-transfer proxies, not verified permanent-only transfers.",
         "target": "log1p(transfer_fee_eur)",
@@ -117,8 +117,8 @@ def train_and_evaluate_all(as_of_date: str | None = None) -> dict[str, Any]:
     }
     with open(MODEL_DIR / "model_metadata.json", "w", encoding="utf-8") as output:
         json.dump(metadata, output, indent=2)
-    with sqlite3.connect(str(DATABASE_PATH)) as conn:
-        register_model(conn, metadata)
+    with SessionLocal() as session:
+        register_model(session, metadata)
     return metadata
 
 

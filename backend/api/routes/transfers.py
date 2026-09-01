@@ -3,21 +3,18 @@ FastAPI Router for Transfers Database Explorer
 """
 
 import math
-import sqlite3
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
-from src.config import DATABASE_PATH
+from src.database import get_db
 
 router = APIRouter(prefix="/api/transfers", tags=["Transfers"])
 
 
-def get_db():
-    if not DATABASE_PATH.exists():
-        raise HTTPException(status_code=500, detail="Database file not found.")
-    conn = sqlite3.connect(str(DATABASE_PATH))
-    conn.row_factory = sqlite3.Row
-    return conn
+def _get_dialect(db: Session) -> str:
+    return db.bind.dialect.name if db.bind else "postgresql"
 
 
 @router.get("")
@@ -30,29 +27,30 @@ def get_transfers(
     sort_by: str = Query(default="fee_desc", pattern="^(fee_desc|fee_asc|date_desc|date_asc)$"),
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=25, ge=1, le=100),
+    db: Session = Depends(get_db),
 ):
     """Query, filter, and paginate transfer deals."""
-    conn = get_db()
-    cursor = conn.cursor()
+    dialect = _get_dialect(db)
+    like_op = "ILIKE" if dialect == "postgresql" else "LIKE"
 
-    where_clauses = ["t.transfer_fee >= ?"]
-    params = [min_fee]
+    where_clauses = ["t.transfer_fee >= :min_fee"]
+    params = {"min_fee": min_fee}
 
     if max_fee is not None:
-        where_clauses.append("t.transfer_fee <= ?")
-        params.append(max_fee)
+        where_clauses.append("t.transfer_fee <= :max_fee")
+        params["max_fee"] = max_fee
 
     if club:
-        where_clauses.append("(t.from_club_name LIKE ? OR t.to_club_name LIKE ?)")
-        params.extend([f"%{club}%", f"%{club}%"])
+        where_clauses.append(f"(t.from_club_name {like_op} :club OR t.to_club_name {like_op} :club)")
+        params["club"] = f"%{club}%"
 
     if position:
-        where_clauses.append("p.position = ?")
-        params.append(position)
+        where_clauses.append("p.position = :position")
+        params["position"] = position
 
     if season:
-        where_clauses.append("t.transfer_season = ?")
-        params.append(season)
+        where_clauses.append("t.transfer_season = :season")
+        params["season"] = season
 
     sort_map = {
         "fee_desc": "t.transfer_fee DESC",
@@ -64,23 +62,22 @@ def get_transfers(
     where_sql = " AND ".join(where_clauses)
 
     # Count total matching
-    cursor.execute(
-        f"""
+    count_sql = f"""
         SELECT COUNT(*) AS total
         FROM transfers t
         JOIN players p ON t.player_id = p.player_id
         WHERE {where_sql}
-        """,
-        tuple(params),
-    )
-    total_count = cursor.fetchone()["total"]
+    """
+    total_res = db.execute(text(count_sql), params)
+    total_count = total_res.scalar() or 0
 
     # Fetch page
     offset = (page - 1) * page_size
-    params.extend([page_size, offset])
+    query_params = dict(params)
+    query_params["limit"] = page_size
+    query_params["offset"] = offset
 
-    cursor.execute(
-        f"""
+    fetch_sql = f"""
         SELECT 
             p.player_id,
             p.name AS player_name,
@@ -96,12 +93,10 @@ def get_transfers(
         JOIN players p ON t.player_id = p.player_id
         WHERE {where_sql}
         ORDER BY {order_clause}
-        LIMIT ? OFFSET ?
-        """,
-        tuple(params),
-    )
-    transfers = [dict(row) for row in cursor.fetchall()]
-    conn.close()
+        LIMIT :limit OFFSET :offset
+    """
+    res = db.execute(text(fetch_sql), query_params)
+    transfers = [dict(row) for row in res.mappings().all()]
 
     return {
         "total": total_count,
@@ -113,12 +108,13 @@ def get_transfers(
 
 
 @router.get("/top")
-def get_top_transfers(limit: int = 10, min_fee: float = 1_000_000):
+def get_top_transfers(
+    limit: int = 10,
+    min_fee: float = 1_000_000,
+    db: Session = Depends(get_db),
+):
     """Get all-time top transfers."""
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute(
-        """
+    fetch_sql = """
         SELECT 
             p.player_id,
             p.name AS player_name,
@@ -130,12 +126,10 @@ def get_top_transfers(limit: int = 10, min_fee: float = 1_000_000):
             t.market_value_in_eur AS market_value_before
         FROM transfers t
         JOIN players p ON t.player_id = p.player_id
-        WHERE t.transfer_fee >= ?
+        WHERE t.transfer_fee >= :min_fee
         ORDER BY t.transfer_fee DESC
-        LIMIT ?
-        """,
-        (min_fee, limit),
-    )
-    rows = [dict(row) for row in cursor.fetchall()]
-    conn.close()
+        LIMIT :limit
+    """
+    res = db.execute(text(fetch_sql), {"min_fee": min_fee, "limit": limit})
+    rows = [dict(row) for row in res.mappings().all()]
     return {"count": len(rows), "transfers": rows}

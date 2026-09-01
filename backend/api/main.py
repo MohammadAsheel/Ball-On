@@ -5,7 +5,7 @@ FastAPI Central Application for BALLON — Football Transfer Intelligence
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.config import DATABASE_PATH
+from src.database import check_db_connection
 from api.routes.overview import router as overview_router
 from api.routes.players import router as players_router
 from api.routes.transfers import router as transfers_router
@@ -46,14 +46,17 @@ app.include_router(news_router)
 
 @app.get("/")
 def root():
+    is_connected = check_db_connection()
     return {
         "message": "BALLON — Football Transfer Intelligence API",
         "version": "2.0.0",
         "docs": "/docs",
-        "database_connected": DATABASE_PATH.exists(),
+        "database_connected": is_connected,
     }
 
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "db_exists": DATABASE_PATH.exists()}
+    is_connected = check_db_connection()
+    return {"status": "ok", "db_connected": is_connected}
+

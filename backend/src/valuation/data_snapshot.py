@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-import sqlite3
 from datetime import date
 from typing import Any
 
 import numpy as np
 import pandas as pd
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 
 FEATURE_COLUMNS = [
@@ -16,22 +17,31 @@ FEATURE_COLUMNS = [
 MARKET_FEATURE_COLUMNS = FEATURE_COLUMNS + ["log_market_value_before"]
 
 
-def ensure_snapshot_indexes(conn: sqlite3.Connection) -> None:
-    """Indexes support point-in-time lookups; they do not alter source data."""
-    conn.executescript(
-        """
-        CREATE INDEX IF NOT EXISTS idx_appearances_player_date ON appearances(player_id, date);
-        CREATE INDEX IF NOT EXISTS idx_valuations_player_date ON player_valuations(player_id, date);
-        CREATE INDEX IF NOT EXISTS idx_transfers_date ON transfers(transfer_date);
-        """
-    )
-    conn.commit()
+def ensure_snapshot_indexes(session: Session) -> None:
+    """Ensure indexes support point-in-time lookups."""
+    stmts = [
+        "CREATE INDEX IF NOT EXISTS idx_appearances_player_date ON appearances(player_id, date)",
+        "CREATE INDEX IF NOT EXISTS idx_valuations_player_date ON player_valuations(player_id, date)",
+        "CREATE INDEX IF NOT EXISTS idx_transfers_date ON transfers(transfer_date)",
+    ]
+    for stmt in stmts:
+        session.execute(text(stmt))
+    session.commit()
 
 
-def _snapshot_query(where_clause: str) -> str:
+def _snapshot_query(where_clause: str, dialect: str = "postgresql") -> str:
+    if dialect == "postgresql":
+        transfer_id_col = "t.transfer_id"
+        date_cutoff = "AND a.date >= (st.transfer_date - INTERVAL '365 days')"
+        age_calc = "ROUND(CAST((st.transfer_date - p.date_of_birth) / 365.25 AS numeric), 3)"
+    else:
+        transfer_id_col = "t.rowid AS transfer_id"
+        date_cutoff = "AND a.date >= DATE(st.transfer_date, '-365 days')"
+        age_calc = "ROUND((JULIANDAY(st.transfer_date) - JULIANDAY(p.date_of_birth)) / 365.25, 3)"
+
     return f"""
     WITH selected_transfers AS (
-        SELECT t.rowid AS transfer_id, t.player_id, t.transfer_date, t.transfer_season,
+        SELECT {transfer_id_col}, t.player_id, t.transfer_date, t.transfer_season,
                t.from_club_id, t.to_club_id, t.from_club_name, t.to_club_name,
                t.transfer_fee
         FROM transfers t
@@ -53,12 +63,11 @@ def _snapshot_query(where_clause: str) -> str:
         FROM selected_transfers st
         LEFT JOIN appearances a ON a.player_id = st.player_id
             AND a.date < st.transfer_date
-            AND a.date >= DATE(st.transfer_date, '-365 days')
+            {date_cutoff}
         GROUP BY st.transfer_id
     )
     SELECT st.*, p.name AS player_name, p.position AS raw_position, p.date_of_birth,
-           ROUND((JULIANDAY(st.transfer_date) - JULIANDAY(p.date_of_birth)) / 365.25, 3)
-               AS age_at_transfer,
+           {age_calc} AS age_at_transfer,
            v.market_value_in_eur AS market_value_before,
            s.prior_appearances, s.prior_minutes, s.prior_goals, s.prior_assists
     FROM selected_transfers st
@@ -86,67 +95,121 @@ def finalise_snapshot(frame: pd.DataFrame) -> pd.DataFrame:
     if frame.empty:
         return frame
     for column in ("prior_appearances", "prior_minutes", "prior_goals", "prior_assists"):
-        frame[column] = pd.to_numeric(frame[column], errors="coerce").fillna(0)
-    frame["position"] = frame["raw_position"].map(normalize_position)
-    minutes = frame["prior_minutes"]
+        if column in frame.columns:
+            frame[column] = pd.to_numeric(frame[column], errors="coerce").fillna(0)
+    if "raw_position" in frame.columns:
+        frame["position"] = frame["raw_position"].map(normalize_position)
+    minutes = frame.get("prior_minutes", pd.Series([0] * len(frame)))
     eligible = minutes >= 270
-    frame["goals_per_90"] = (frame["prior_goals"] / minutes.where(eligible, 1) * 90).where(eligible, 0.0)
-    frame["assists_per_90"] = (frame["prior_assists"] / minutes.where(eligible, 1) * 90).where(eligible, 0.0)
-    frame["log_market_value_before"] = frame["market_value_before"].clip(lower=0).map(
-        lambda value: np.log1p(value) if pd.notna(value) else np.nan
-    )
+    if "prior_goals" in frame.columns:
+        frame["goals_per_90"] = (frame["prior_goals"] / minutes.where(eligible, 1) * 90).where(eligible, 0.0)
+    if "prior_assists" in frame.columns:
+        frame["assists_per_90"] = (frame["prior_assists"] / minutes.where(eligible, 1) * 90).where(eligible, 0.0)
+    if "market_value_before" in frame.columns:
+        frame["log_market_value_before"] = frame["market_value_before"].clip(lower=0).map(
+            lambda value: np.log1p(value) if pd.notna(value) else np.nan
+        )
     return frame
 
 
-def load_paid_transfer_snapshots(conn: sqlite3.Connection, as_of_date: str) -> pd.DataFrame:
-    """Return known, positive-fee transfers up to ``as_of_date``.
-
-    The source schema has no transfer-type column. Therefore `paid_transfer_proxy`
-    is preserved in the output and this cannot be represented as verified permanent-only data.
-    """
-    ensure_snapshot_indexes(conn)
+def load_paid_transfer_snapshots(session: Session, as_of_date: str) -> pd.DataFrame:
+    """Return known, positive-fee transfers up to ``as_of_date``."""
+    dialect = session.bind.dialect.name if session.bind else "postgresql"
     query = _snapshot_query(
         "t.transfer_fee IS NOT NULL AND t.transfer_fee > 0 "
-        "AND t.transfer_date IS NOT NULL AND t.transfer_date <= :as_of_date"
+        "AND t.transfer_date IS NOT NULL AND t.transfer_date <= :as_of_date",
+        dialect=dialect,
     )
-    frame = pd.read_sql_query(query, conn, params={"as_of_date": as_of_date})
+    bind = session.get_bind()
+    frame = pd.read_sql_query(text(query), bind, params={"as_of_date": as_of_date})
     frame = finalise_snapshot(frame)
     frame["paid_transfer_proxy"] = True
     return frame
 
 
-def load_historical_transfer_snapshot(conn: sqlite3.Connection, transfer_id: int) -> pd.DataFrame:
-    ensure_snapshot_indexes(conn)
-    frame = pd.read_sql_query(_snapshot_query("t.rowid = :transfer_id"), conn, params={"transfer_id": transfer_id})
+def load_historical_transfer_snapshot(session: Session, transfer_id: int) -> pd.DataFrame:
+    dialect = session.bind.dialect.name if session.bind else "postgresql"
+    where = "t.transfer_id = :transfer_id" if dialect == "postgresql" else "t.rowid = :transfer_id"
+    query = _snapshot_query(where, dialect=dialect)
+    bind = session.get_bind()
+    frame = pd.read_sql_query(text(query), bind, params={"transfer_id": transfer_id})
     return finalise_snapshot(frame)
 
 
-def load_player_snapshot(conn: sqlite3.Connection, player_id: int, snapshot_date: str | None = None) -> dict[str, Any] | None:
+def load_player_snapshot(session: Session, player_id: int, snapshot_date: str | None = None) -> dict[str, Any] | None:
     """Construct a current hypothetical snapshot using only data before the supplied date."""
     if snapshot_date is None:
         snapshot_date = date.today().isoformat()
-    player = conn.execute(
-        "SELECT player_id, name, position, date_of_birth FROM players WHERE player_id = ?", (player_id,)
-    ).fetchone()
-    if player is None:
+
+    dialect = session.bind.dialect.name if session.bind else "postgresql"
+
+    player_stmt = text("SELECT player_id, name, position, date_of_birth FROM players WHERE player_id = :player_id")
+    player_res = session.execute(player_stmt, {"player_id": player_id}).mappings().first()
+    if player_res is None:
         return None
-    ensure_snapshot_indexes(conn)
-    row = conn.execute(
+
+    player = dict(player_res)
+
+    if dialect == "postgresql":
+        stats_sql = """
+            SELECT 
+                COUNT(a.appearance_id) AS prior_appearances, 
+                COALESCE(SUM(a.minutes_played), 0) AS prior_minutes,
+                COALESCE(SUM(a.goals), 0) AS prior_goals, 
+                COALESCE(SUM(a.assists), 0) AS prior_assists,
+                (
+                    SELECT market_value_in_eur 
+                    FROM player_valuations pv
+                    WHERE pv.player_id = :player_id AND pv.date <= CAST(:snapshot_date AS DATE) 
+                    ORDER BY pv.date DESC 
+                    LIMIT 1
+                ) AS market_value_before
+            FROM appearances a
+            WHERE a.player_id = :player_id 
+              AND a.date < CAST(:snapshot_date AS DATE) 
+              AND a.date >= (CAST(:snapshot_date AS DATE) - INTERVAL '365 days')
         """
-        SELECT COUNT(a.appearance_id), COALESCE(SUM(a.minutes_played), 0),
-               COALESCE(SUM(a.goals), 0), COALESCE(SUM(a.assists), 0),
-               (SELECT market_value_in_eur FROM player_valuations pv
-                 WHERE pv.player_id = ? AND pv.date <= ? ORDER BY pv.date DESC LIMIT 1)
-        FROM appearances a
-        WHERE a.player_id = ? AND a.date < ? AND a.date >= DATE(?, '-365 days')
-        """,
-        (player_id, snapshot_date, player_id, snapshot_date, snapshot_date),
-    ).fetchone()
+    else:
+        stats_sql = """
+            SELECT 
+                COUNT(a.appearance_id) AS prior_appearances, 
+                COALESCE(SUM(a.minutes_played), 0) AS prior_minutes,
+                COALESCE(SUM(a.goals), 0) AS prior_goals, 
+                COALESCE(SUM(a.assists), 0) AS prior_assists,
+                (
+                    SELECT market_value_in_eur 
+                    FROM player_valuations pv
+                    WHERE pv.player_id = :player_id AND pv.date <= :snapshot_date 
+                    ORDER BY pv.date DESC 
+                    LIMIT 1
+                ) AS market_value_before
+            FROM appearances a
+            WHERE a.player_id = :player_id 
+              AND a.date < :snapshot_date 
+              AND a.date >= DATE(:snapshot_date, '-365 days')
+        """
+
+    stats_res = session.execute(text(stats_sql), {"player_id": player_id, "snapshot_date": snapshot_date}).mappings().first()
+    stats = dict(stats_res) if stats_res else {}
+
+    dob = player.get("date_of_birth")
+    age = None
+    if dob:
+        age = (pd.Timestamp(snapshot_date) - pd.Timestamp(dob)).days / 365.25
+
     frame = pd.DataFrame([{
-        "player_id": player[0], "player_name": player[1], "raw_position": player[2],
-        "date_of_birth": player[3], "transfer_date": snapshot_date,
-        "age_at_transfer": (pd.Timestamp(snapshot_date) - pd.Timestamp(player[3])).days / 365.25 if player[3] else None,
-        "prior_appearances": row[0], "prior_minutes": row[1], "prior_goals": row[2],
-        "prior_assists": row[3], "market_value_before": row[4],
+        "player_id": player["player_id"],
+        "player_name": player["name"],
+        "raw_position": player["position"],
+        "date_of_birth": dob,
+        "transfer_date": snapshot_date,
+        "age_at_transfer": age,
+        "prior_appearances": stats.get("prior_appearances", 0),
+        "prior_minutes": stats.get("prior_minutes", 0),
+        "prior_goals": stats.get("prior_goals", 0),
+        "prior_assists": stats.get("prior_assists", 0),
+        "market_value_before": stats.get("market_value_before"),
     }])
-    return finalise_snapshot(frame).iloc[0].to_dict()
+    
+    final_df = finalise_snapshot(frame)
+    return final_df.iloc[0].to_dict()
