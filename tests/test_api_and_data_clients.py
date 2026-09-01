@@ -73,20 +73,20 @@ def test_estimator_predict_and_player_mode(client):
         "prior_minutes": 2500,
         "goals": 16,
         "assists": 9,
-        "use_market_value": True,
+        "configuration": "market_aware",
     }
     res_predict = client.post("/api/estimator/predict", json=payload)
     assert res_predict.status_code == 200
     data_pred = res_predict.json()
-    assert "estimated_transfer_value" in data_pred
-    assert data_pred["estimated_transfer_value"] > 0
-    assert len(data_pred["feature_impacts"]) > 0
+    assert "estimated_transfer_value" in data_pred["valuation"]
+    assert data_pred["valuation"]["estimated_transfer_value"] > 0
+    assert len(data_pred["valuation"]["model_explanation"]["contributions"]) > 0
 
     # Models benchmark info
     res_models = client.get("/api/estimator/models")
     assert res_models.status_code == 200
     data_models = res_models.json()
-    assert "models_benchmark" in data_models
+    assert "test_results" in data_models
 
 
 def test_sportmonks_live_endpoints(client):

@@ -10,7 +10,7 @@ import {
   Info,
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { ValuationPrediction, PlayerSearchItem, ModelMetadata } from '@/lib/types';
+import { EstimatorResponse, PlayerSearchItem, ModelMetadata } from '@/lib/types';
 import { formatEUR, formatNumber } from '@/lib/format';
 import { CardSkeleton } from '@/components/ui/Skeleton';
 import { FaviconSearch } from '@/components/ui/FaviconSearch';
@@ -39,8 +39,8 @@ function TransferEstimatorContent() {
   const [assists, setAssists] = useState<number>(8);
   const [useMarketValue, setUseMarketValue] = useState<boolean>(true);
 
-  // Output State
-  const [result, setResult] = useState<ValuationPrediction | null>(null);
+  // Result & Benchmark State
+  const [result, setResult] = useState<EstimatorResponse | null>(null);
   const [modelMeta, setModelMeta] = useState<ModelMetadata | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -83,32 +83,14 @@ function TransferEstimatorContent() {
       setSelectedPlayer(data);
       setMode('player');
 
-      // Autofill scenario inputs
-      setName(data.player.name);
-      setAge(data.player.age || 24);
-      setPosition(data.player.position || 'Attack');
-      setMarketValue(data.player.market_value_in_eur || 15_000_000);
-      setMinutes(data.stats.prior_minutes || 2000);
-      setGoals(data.stats.prior_goals || 8);
-      setAssists(data.stats.prior_assists || 5);
-
-      setResult({
-        player_name: data.player.name,
-        model_used: data.model_used,
-        estimated_transfer_value: data.valuation.estimated_transfer_value,
-        raw_prediction: data.valuation.estimated_transfer_value,
-        feature_impacts: data.feature_impacts,
-        inputs: {
-          name: data.player.name,
-          age: data.player.age || 24,
-          position: data.player.position || 'Attack',
-          market_value_before: data.player.market_value_in_eur || 15_000_000,
-          prior_minutes: data.stats.prior_minutes || 2000,
-          goals: data.stats.prior_goals || 8,
-          assists: data.stats.prior_assists || 5,
-          use_market_value: true,
-        },
-      });
+      setName(data.snapshot.player_name || 'Custom Player');
+      setAge(data.snapshot.age_at_transfer || 24);
+      setPosition(data.snapshot.position || 'Attack');
+      setMarketValue(data.snapshot.market_value_before || 15_000_000);
+      setMinutes(data.snapshot.prior_minutes || 0);
+      setGoals(data.snapshot.prior_goals || 0);
+      setAssists(data.snapshot.prior_assists || 0);
+      setResult(data);
     } catch (err) {
       console.error('Failed to estimate player:', err);
     } finally {
@@ -127,7 +109,7 @@ function TransferEstimatorContent() {
         prior_minutes: minutes,
         goals,
         assists,
-        use_market_value: useMarketValue,
+        configuration: useMarketValue ? 'market_aware' : 'performance_only',
       });
       setResult(res);
     } catch (err) {
@@ -214,14 +196,14 @@ function TransferEstimatorContent() {
               {selectedPlayer && (
                 <div className="p-4 rounded-xl bg-slate-900/90 border border-sky-500/20 space-y-2">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-bold text-white">{selectedPlayer.player.name}</h4>
-                    <span className="badge badge-blue">{selectedPlayer.player.position}</span>
+                    <h4 className="text-sm font-bold text-white">{selectedPlayer.snapshot.player_name}</h4>
+                    <span className="badge badge-blue">{selectedPlayer.snapshot.position}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-xs text-slate-400 pt-1">
-                    <div>Age: <strong className="text-white">{selectedPlayer.player.age} yrs</strong></div>
-                    <div>Market Val: <strong className="text-white">{formatEUR(selectedPlayer.player.market_value_in_eur)}</strong></div>
-                    <div>Prior Mins: <strong className="text-white">{formatNumber(selectedPlayer.stats.prior_minutes)}'</strong></div>
-                    <div>Prior Goals: <strong className="text-white">{selectedPlayer.stats.prior_goals}</strong></div>
+                    <div>Age: <strong className="text-white">{selectedPlayer.snapshot.age_at_transfer?.toFixed(1)} yrs</strong></div>
+                    <div>Market Val: <strong className="text-white">{selectedPlayer.snapshot.market_value_before ? formatEUR(selectedPlayer.snapshot.market_value_before) : 'N/A'}</strong></div>
+                    <div>Prior Mins: <strong className="text-white">{formatNumber(selectedPlayer.snapshot.prior_minutes || 0)}'</strong></div>
+                    <div>Prior Goals: <strong className="text-white">{selectedPlayer.snapshot.prior_goals || 0}</strong></div>
                   </div>
                 </div>
               )}
@@ -355,45 +337,20 @@ function TransferEstimatorContent() {
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-sky-400">BALLON Transfer Estimate</span>
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-white/10">
-                    {result.model_used}
+                    {result.valuation.model_type}
                   </span>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs text-slate-400">Estimated Transfer Value for <strong className="text-white">{result.player_name}</strong></p>
+                  <p className="text-xs text-slate-400">Estimated Transfer Value for <strong className="text-white">{result.snapshot.player_name || 'this player'}</strong></p>
                   <h2 className="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-sky-400 to-indigo-300">
-                    {formatEUR(result.estimated_transfer_value)}
+                    {formatEUR(result.valuation.estimated_transfer_value)}
                   </h2>
                 </div>
 
-                {/* Comparative Deltas if in Player Mode */}
-                {selectedPlayer && selectedPlayer.valuation && (
-                  <div className="grid grid-cols-2 gap-3 pt-3 border-t border-white/5 text-xs">
-                    <div className="p-3 rounded-lg bg-slate-900/60 border border-white/5">
-                      <p className="text-slate-400">Actual Transfer Fee</p>
-                      <p className="text-sm font-bold text-white mt-0.5">
-                        {selectedPlayer.valuation.actual_transfer_fee ? formatEUR(selectedPlayer.valuation.actual_transfer_fee) : 'Not available'}
-                      </p>
-                      {selectedPlayer.valuation.diff_vs_actual_pct !== null && (
-                        <p className={`text-[11px] font-semibold mt-0.5 ${selectedPlayer.valuation.diff_vs_actual >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                          {selectedPlayer.valuation.diff_vs_actual >= 0 ? '+' : ''}{selectedPlayer.valuation.diff_vs_actual_pct}% diff
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="p-3 rounded-lg bg-slate-900/60 border border-white/5">
-                      <p className="text-slate-400">Current Market Value</p>
-                      <p className="text-sm font-bold text-white mt-0.5">
-                        {formatEUR(selectedPlayer.valuation.market_value)}
-                      </p>
-                      {selectedPlayer.valuation.diff_vs_market_pct !== null && (
-                        <p className={`text-[11px] font-semibold mt-0.5 ${selectedPlayer.valuation.diff_vs_market >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                          {selectedPlayer.valuation.diff_vs_market >= 0 ? '+' : ''}{selectedPlayer.valuation.diff_vs_market_pct}% diff
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
+                <p className="text-[11px] text-slate-400 border-t border-white/5 pt-3">
+                  Data quality: <span className="text-white font-semibold">{result.valuation.data_quality.level}</span>. {result.valuation.data_quality.note}
+                </p>
               </div>
 
               {/* Model Explanation: Why does BALLON estimate this value? */}
@@ -403,36 +360,38 @@ function TransferEstimatorContent() {
                   <h3 className="text-base font-bold text-white tracking-tight">Why does BALLON estimate this value?</h3>
                 </div>
                 <p className="text-xs text-slate-400">
-                  Feature contributions derived from the model&rsquo;s trained log-linear coefficients and standardized feature vectors:
+                  {result.valuation.model_explanation.note}
                 </p>
 
                 <div className="space-y-2.5">
-                  {result.feature_impacts.map((f, i) => (
+                  {(result.valuation.model_explanation.contributions ?? []).map((f, i) => (
                     <div
                       key={i}
                       className="p-3 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between text-xs"
                     >
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-white">{f.feature}</span>
-                          <span className="text-slate-400">({f.value})</span>
+                          <span className="font-bold text-white">{f.feature.replace(/^(num|cat)__/, '')}</span>
                         </div>
-                        <p className="text-[11px] text-slate-400">{f.description}</p>
+                        <p className="text-[11px] text-slate-400">Model contribution: {f.contribution_log_fee.toFixed(4)} log-fee units</p>
                       </div>
 
                       <span
                         className={`font-bold px-2 py-0.5 rounded text-[11px] ${
-                          f.effect === 'Positive'
+                          f.direction === 'positive'
                             ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                            : f.effect === 'Negative'
+                            : f.direction === 'negative'
                             ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
                             : 'bg-slate-800 text-slate-400 border border-white/10'
                         }`}
                       >
-                        {f.effect} Impact
+                        {f.direction === 'positive' ? 'Positive' : 'Negative'} impact
                       </span>
                     </div>
                   ))}
+                  {result.valuation.model_explanation.contributions.length === 0 && (
+                    <p className="text-xs text-slate-400">{result.valuation.model_explanation.method}</p>
+                  )}
                 </div>
               </div>
             </>
@@ -445,7 +404,7 @@ function TransferEstimatorContent() {
       </div>
 
       {/* Model Performance & Evaluation Benchmarks */}
-      {modelMeta && modelMeta.models_benchmark && (
+      {modelMeta && modelMeta.test_results && (
         <div className="glass-card p-6 border border-white/5 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -453,7 +412,7 @@ function TransferEstimatorContent() {
               <h3 className="text-base font-bold text-white tracking-tight">Model Evaluation Benchmarks</h3>
             </div>
             <span className="text-xs text-slate-400">
-              Untouched Chronological Test Set ({modelMeta.test_samples.toLocaleString()} transfers since {modelMeta.split_date})
+              Untouched Chronological Test Set ({modelMeta.sample_counts.test.toLocaleString()} transfers since {modelMeta.periods.test_start})
             </span>
           </div>
 
@@ -469,15 +428,15 @@ function TransferEstimatorContent() {
                 </tr>
               </thead>
               <tbody>
-                {Object.values(modelMeta.models_benchmark).map((m, idx) => (
-                  <tr key={idx} className={m.model_name.includes('MarketAware') ? 'bg-sky-500/5' : ''}>
-                    <td className="font-bold text-white">{m.model_name.replace(/_/g, ' ')}</td>
+                {Object.entries(modelMeta.test_results).map(([name, m]) => (
+                  <tr key={name} className={name.includes('market_aware') ? 'bg-sky-500/5' : ''}>
+                    <td className="font-bold text-white">{name.replace(/_/g, ' ')}</td>
                     <td className="text-xs text-slate-300">
-                      {m.model_name.startsWith('Log') ? 'log1p(transfer_fee)' : 'Raw EUR'}
+                      {name.includes('baseline') ? 'Raw EUR' : 'log1p(transfer_fee)'}
                     </td>
-                    <td className="font-bold text-emerald-400">{formatEUR(m.MAE)}</td>
-                    <td className="text-slate-300">{formatEUR(m.RMSE)}</td>
-                    <td className="font-semibold text-sky-400">{m.R2}</td>
+                    <td className="font-bold text-emerald-400">{formatEUR(m.mae_eur)}</td>
+                    <td className="text-slate-300">{formatEUR(m.rmse_eur)}</td>
+                    <td className="font-semibold text-sky-400">{m.r2}</td>
                   </tr>
                 ))}
               </tbody>

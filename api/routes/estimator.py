@@ -1,258 +1,167 @@
-"""
-FastAPI Router for BALLON Transfer Valuation Engine
-"""
+"""Honest API surface for the BALLON historical valuation engine."""
+
+from __future__ import annotations
 
 import json
 import sqlite3
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Literal
 
 import joblib
 import numpy as np
 import pandas as pd
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel, Field, model_validator
 
 from src.config import DATABASE_PATH, MODEL_DIR
+from src.valuation.data_snapshot import MARKET_FEATURE_COLUMNS, FEATURE_COLUMNS, load_historical_transfer_snapshot, load_player_snapshot, normalize_position
+from src.valuation.explainer import ridge_contributions
+from src.valuation.registry import record_prediction
 
 router = APIRouter(prefix="/api/estimator", tags=["Estimator"])
 
-# Load models and metadata on startup
-market_model = None
-perf_model = None
-model_meta = {}
 
-market_model_path = MODEL_DIR / "valuation_market_aware.joblib"
-perf_model_path = MODEL_DIR / "valuation_perf_only.joblib"
-meta_path = MODEL_DIR / "model_metadata.json"
-
-if market_model_path.exists():
-    try:
-        market_model = joblib.load(market_model_path)
-    except Exception as e:
-        print(f"Error loading market model: {e}")
-
-if perf_model_path.exists():
-    try:
-        perf_model = joblib.load(perf_model_path)
-    except Exception as e:
-        print(f"Error loading perf model: {e}")
-
-if meta_path.exists():
-    try:
-        with open(meta_path, "r", encoding="utf-8") as f:
-            model_meta = json.load(f)
-    except Exception as e:
-        print(f"Error loading model metadata: {e}")
+def _metadata() -> dict[str, Any]:
+    path = MODEL_DIR / "model_metadata.json"
+    if not path.exists():
+        raise HTTPException(status_code=503, detail="No trained valuation model is available. Run `python -m src.models.train` first.")
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
-def get_db():
+def _model(configuration: Literal["performance_only", "market_aware"]):
+    metadata = _metadata()
+    artifact = metadata["artifacts"].get(configuration)
+    if not artifact:
+        raise HTTPException(status_code=503, detail=f"The {configuration} model artifact is unavailable.")
+    path = MODEL_DIR / artifact["path"]
+    if not path.exists():
+        raise HTTPException(status_code=503, detail=f"Model artifact missing: {path.name}")
+    return joblib.load(path), metadata, artifact
+
+
+def _quality(snapshot: dict[str, Any]) -> dict[str, Any]:
+    fields = {
+        "age": snapshot.get("age_at_transfer") is not None,
+        "position": snapshot.get("position") != "UNKNOWN",
+        "pre_transfer_market_value": snapshot.get("market_value_before") is not None,
+        "minimum_minutes": float(snapshot.get("prior_minutes") or 0) >= 270,
+    }
+    count = sum(fields.values())
+    return {"level": "High" if count == 4 else "Medium" if count >= 2 else "Low", "available_fields": fields,
+            "note": "Data quality measures input completeness, not prediction confidence."}
+
+
+def _predict(snapshot: dict[str, Any], configuration: Literal["performance_only", "market_aware"]) -> dict[str, Any]:
+    if snapshot.get("age_at_transfer") is None:
+        raise HTTPException(status_code=422, detail="A valid date of birth is required to calculate age at the valuation date.")
+    if configuration == "market_aware" and snapshot.get("market_value_before") is None:
+        raise HTTPException(status_code=422, detail="Market-aware valuation requires a dated market value at or before the snapshot date. Use performance_only instead.")
+    model, metadata, artifact = _model(configuration)
+    columns = MARKET_FEATURE_COLUMNS if configuration == "market_aware" else FEATURE_COLUMNS
+    row = pd.DataFrame([{column: snapshot.get(column) for column in columns}])
+    value = float(model.predict(row)[0])
+    explanation = ridge_contributions(model, row) if artifact["model_name"].startswith(("ridge_", "linear_")) else []
+    return {
+        "estimated_transfer_value": round(value, 2),
+        "model_version": metadata["model_version"],
+        "model_type": artifact["model_name"],
+        "target_transform": metadata["target"],
+        "data_quality": _quality(snapshot),
+        "model_explanation": {
+            "method": "additive transformed-feature contributions in log-fee space" if explanation else "No individual explanation is implemented for this selected model.",
+            "contributions": explanation,
+            "note": "Contributions are model-derived log-target terms; they are not independently calculated EUR premiums.",
+        },
+    }
+
+
+def _db() -> sqlite3.Connection:
     if not DATABASE_PATH.exists():
         raise HTTPException(status_code=500, detail="Database file not found.")
-    conn = sqlite3.connect(str(DATABASE_PATH))
-    conn.row_factory = sqlite3.Row
-    return conn
+    connection = sqlite3.connect(str(DATABASE_PATH))
+    connection.row_factory = sqlite3.Row
+    return connection
+
+
+def _record(snapshot: dict[str, Any], valuation: dict[str, Any], configuration: str) -> int:
+    with _db() as connection:
+        return record_prediction(connection, snapshot, valuation, configuration)
 
 
 class PredictScenarioRequest(BaseModel):
-    name: Optional[str] = "Custom Player"
-    age: float = Field(default=24.0, ge=15.0, le=45.0, description="Player age at transfer")
-    position: str = Field(default="Attack", description="Attack, Midfield, Defender, or Goalkeeper")
-    market_value_before: float = Field(default=25_000_000, ge=0, description="Pre-transfer market value in EUR")
-    prior_minutes: int = Field(default=2200, ge=0, description="Prior season minutes played")
-    goals: int = Field(default=12, ge=0, description="Prior season goals")
-    assists: int = Field(default=8, ge=0, description="Prior season assists")
-    use_market_value: bool = Field(default=True, description="True for Market-Aware Model, False for Performance-Only Model")
+    name: str | None = "Custom Player"
+    age: float = Field(ge=15, le=45, description="Age at the hypothetical valuation date")
+    position: str
+    prior_minutes: int = Field(ge=0)
+    goals: int = Field(ge=0)
+    assists: int = Field(ge=0)
+    market_value_before: float | None = Field(default=None, ge=0, description="Dated pre-transfer market value in EUR")
+    configuration: Literal["performance_only", "market_aware"] = "market_aware"
+
+    @model_validator(mode="after")
+    def validate_market_value(self):
+        if self.configuration == "market_aware" and self.market_value_before is None:
+            raise ValueError("market_value_before is required for market_aware predictions")
+        return self
+
+
+class HistoricalRequest(BaseModel):
+    player_id: int
+    transfer_id: int = Field(description="SQLite row id exposed by transfer lookup; this source has no native transfer ID column")
+    configuration: Literal["performance_only", "market_aware"] = "market_aware"
 
 
 @router.get("/models")
-def get_models_benchmark():
-    """Return authentic test-set evaluation metrics and feature weights from training."""
-    return model_meta
+def models() -> dict[str, Any]:
+    """Validation and untouched-test metrics for every evaluated candidate."""
+    return _metadata()
+
+
+@router.get("/model-info")
+def model_info() -> dict[str, Any]:
+    return _metadata()
 
 
 @router.post("/predict")
-def predict_scenario(req: PredictScenarioRequest):
-    """
-    Run valuation engine on Scenario Mode inputs using authentic trained Log-Target Ridge models.
-    """
-    mins = max(1, req.prior_minutes)
-    goals_p90 = (req.goals / mins) * 90 if mins >= 270 else 0.0
-    assists_p90 = (req.assists / mins) * 90 if mins >= 270 else 0.0
-
-    # Build input DataFrame
-    input_data = {
-        "age_at_transfer": [req.age],
-        "prior_minutes": [req.prior_minutes],
-        "goals_per_90": [goals_p90],
-        "assists_per_90": [assists_p90],
-        "position": [req.position],
+def predict_scenario(request: PredictScenarioRequest) -> dict[str, Any]:
+    minutes = request.prior_minutes
+    snapshot = {
+        "player_name": request.name, "transfer_date": None, "age_at_transfer": request.age,
+        "position": normalize_position(request.position), "prior_minutes": minutes,
+        "prior_appearances": None, "prior_goals": request.goals, "prior_assists": request.assists,
+        "goals_per_90": (request.goals / minutes * 90) if minutes >= 270 else 0.0,
+        "assists_per_90": (request.assists / minutes * 90) if minutes >= 270 else 0.0,
+        "market_value_before": request.market_value_before,
+        "log_market_value_before": np.log1p(request.market_value_before) if request.market_value_before is not None else None,
     }
+    result = _predict(snapshot, request.configuration)
+    return {"mode": "scenario", "label": "HYPOTHETICAL BALLON ESTIMATED TRANSFER VALUE", "snapshot": snapshot,
+            "valuation": result, "prediction_id": _record(snapshot, result, request.configuration), "actual_transfer_fee": None}
 
-    if req.use_market_value and market_model is not None:
-        input_data["log_market_value_before"] = [np.log1p(max(0, req.market_value_before))]
-        df_input = pd.DataFrame(input_data)
-        pred_fee = float(market_model.predict(df_input)[0])
-        model_used = "LogRidge_MarketAware"
-    elif perf_model is not None:
-        df_input = pd.DataFrame(input_data)
-        pred_fee = float(perf_model.predict(df_input)[0])
-        model_used = "LogRidge_PerfOnly"
-    else:
-        # Fallback baseline
-        pred_fee = float(req.market_value_before) if req.market_value_before > 0 else 5_000_000.0
-        model_used = "Heuristic_Fallback"
 
-    # Clean estimated value
-    pred_fee = max(100_000.0, pred_fee)
-
-    # Feature contribution direction
-    feature_impacts = [
-        {
-            "feature": "Prior Market Value",
-            "value": f"€{req.market_value_before / 1_000_000:.1f}M" if req.use_market_value else "Excluded (Perf-Only)",
-            "effect": "Positive" if req.use_market_value and req.market_value_before > 0 else "Neutral",
-            "description": "Baseline anchor establishing player pricing tier in the market.",
-        },
-        {
-            "feature": "Prior Season Minutes",
-            "value": f"{req.prior_minutes:,} mins",
-            "effect": "Positive" if req.prior_minutes >= 1500 else "Negative",
-            "description": "Sustained starter workload increases deal confidence.",
-        },
-        {
-            "feature": "Age at Transfer",
-            "value": f"{req.age:.1f} years",
-            "effect": "Positive" if req.age <= 25 else "Negative",
-            "description": "Younger players command higher future resale premium.",
-        },
-        {
-            "feature": "Goals / 90",
-            "value": f"{goals_p90:.2f} per 90",
-            "effect": "Positive" if goals_p90 > 0.2 else "Neutral",
-            "description": "Direct scoring productivity contribution.",
-        },
-        {
-            "feature": "Assists / 90",
-            "value": f"{assists_p90:.2f} per 90",
-            "effect": "Positive" if assists_p90 > 0.15 else "Neutral",
-            "description": "Playmaking and chance creation rate.",
-        },
-        {
-            "feature": "Position",
-            "value": req.position,
-            "effect": "Positive" if req.position == "Attack" else "Neutral",
-            "description": "Attackers trade at higher fee multiples.",
-        },
-    ]
-
-    return {
-        "player_name": req.name,
-        "model_used": model_used,
-        "estimated_transfer_value": round(pred_fee, -4),
-        "raw_prediction": pred_fee,
-        "feature_impacts": feature_impacts,
-        "inputs": req.model_dump(),
-    }
+@router.post("/historical")
+def historical(request: HistoricalRequest) -> dict[str, Any]:
+    with _db() as connection:
+        frame = load_historical_transfer_snapshot(connection, request.transfer_id)
+    if frame.empty:
+        raise HTTPException(status_code=404, detail="Transfer not found")
+    snapshot = frame.iloc[0].to_dict()
+    if int(snapshot["player_id"]) != request.player_id:
+        raise HTTPException(status_code=422, detail="transfer_id does not belong to player_id")
+    result = _predict(snapshot, request.configuration)
+    actual = float(snapshot["transfer_fee"])
+    estimate = result["estimated_transfer_value"]
+    return {"mode": "historical", "label": "HISTORICAL BALLON ESTIMATED TRANSFER VALUE", "transfer_id": request.transfer_id,
+            "feature_snapshot_date": snapshot["transfer_date"], "snapshot": snapshot, "valuation": result,
+            "prediction_id": _record(snapshot, result, request.configuration), "actual_transfer_fee": actual, "difference_vs_actual": round(estimate - actual, 2)}
 
 
 @router.get("/player/{player_id}")
-def estimate_player_value(player_id: int):
-    """
-    Run valuation engine on authentic database statistics for a specific player (Player Mode).
-    """
-    conn = get_db()
-    cursor = conn.cursor()
-
-    # Bio
-    cursor.execute(
-        """
-        SELECT player_id, name, position, market_value_in_eur, date_of_birth,
-               ROUND((JULIANDAY('now') - JULIANDAY(date_of_birth)) / 365.25, 1) AS age
-        FROM players WHERE player_id = ?
-        """,
-        (player_id,),
-    )
-    p_row = cursor.fetchone()
-    if not p_row:
-        conn.close()
+def player_value(player_id: int, snapshot_date: str | None = Query(default=None), configuration: Literal["performance_only", "market_aware"] = "market_aware") -> dict[str, Any]:
+    with _db() as connection:
+        snapshot = load_player_snapshot(connection, player_id, snapshot_date)
+    if snapshot is None:
         raise HTTPException(status_code=404, detail="Player not found")
-    player = dict(p_row)
-
-    # Latest transfer
-    cursor.execute(
-        """
-        SELECT transfer_date, transfer_fee, market_value_in_eur, from_club_name, to_club_name
-        FROM transfers
-        WHERE player_id = ? AND transfer_fee > 0
-        ORDER BY transfer_date DESC LIMIT 1
-        """,
-        (player_id,),
-    )
-    latest_transfer_row = cursor.fetchone()
-    latest_transfer = dict(latest_transfer_row) if latest_transfer_row else None
-
-    # Performance in the last 365 days / past year
-    cursor.execute(
-        """
-        SELECT 
-            COUNT(appearance_id) AS prior_appearances,
-            COALESCE(SUM(minutes_played), 0) AS prior_minutes,
-            COALESCE(SUM(goals), 0) AS prior_goals,
-            COALESCE(SUM(assists), 0) AS prior_assists
-        FROM appearances
-        WHERE player_id = ?
-        """,
-        (player_id,),
-    )
-    stats_row = cursor.fetchone()
-    stats = dict(stats_row) if stats_row else {"prior_minutes": 0, "prior_goals": 0, "prior_assists": 0}
-
-    conn.close()
-
-    age = player.get("age") or 25.0
-    pos = player.get("position") or "Attack"
-    mv = player.get("market_value_in_eur") or 10_000_000
-    mins = stats.get("prior_minutes", 0)
-    goals = stats.get("prior_goals", 0)
-    assists = stats.get("prior_assists", 0)
-
-    # Run scenario predict
-    req = PredictScenarioRequest(
-        name=player["name"],
-        age=age,
-        position=pos,
-        market_value_before=mv,
-        prior_minutes=mins,
-        goals=goals,
-        assists=assists,
-        use_market_value=True,
-    )
-    prediction_result = predict_scenario(req)
-
-    # Comparison metrics
-    actual_fee = latest_transfer["transfer_fee"] if latest_transfer else None
-    estimated_fee = prediction_result["estimated_transfer_value"]
-
-    diff_actual = (estimated_fee - actual_fee) if actual_fee is not None else None
-    diff_actual_pct = round((diff_actual / actual_fee) * 100, 1) if (actual_fee and actual_fee > 0) else None
-
-    diff_market = estimated_fee - mv if mv > 0 else None
-    diff_market_pct = round((diff_market / mv) * 100, 1) if (mv and mv > 0) else None
-
-    return {
-        "player": player,
-        "latest_transfer": latest_transfer,
-        "stats": stats,
-        "valuation": {
-            "estimated_transfer_value": estimated_fee,
-            "actual_transfer_fee": actual_fee,
-            "market_value": mv,
-            "diff_vs_actual": diff_actual,
-            "diff_vs_actual_pct": diff_actual_pct,
-            "diff_vs_market": diff_market,
-            "diff_vs_market_pct": diff_market_pct,
-        },
-        "model_used": prediction_result["model_used"],
-        "feature_impacts": prediction_result["feature_impacts"],
-    }
+    result = _predict(snapshot, configuration)
+    return {"mode": "player", "label": "CURRENT BALLON ESTIMATED TRANSFER VALUE", "feature_snapshot_date": snapshot["transfer_date"],
+            "snapshot": snapshot, "valuation": result, "prediction_id": _record(snapshot, result, configuration), "actual_transfer_fee": None}

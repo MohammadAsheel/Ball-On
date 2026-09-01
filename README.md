@@ -1,4 +1,4 @@
-# Football Transfer Value Predictor ⚽
+# BALLON Valuation Engine ⚽
 
 An end-to-end machine learning system that predicts football player transfer fees using historical performance data, then compares predictions against actual transfer values.
 
@@ -87,14 +87,12 @@ python -m src.preprocessing.feature_engineering
 ### 5. Train Model
 
 ```bash
-# (Coming in Phase 6)
 python -m src.models.train
 ```
 
 ### 6. Start API
 
 ```bash
-# (Coming in Phase 9)
 uvicorn api.main:app --reload
 ```
 
@@ -136,6 +134,23 @@ Every feature is computed using data available **before** the transfer date. Pos
 | Ridge Regression | Regularized linear model | Handle multicollinearity |
 | Random Forest | Ensemble of decision trees | Non-linear patterns |
 | XGBoost | Gradient-boosted trees | State-of-art tabular |
+
+## BALLON methodology
+
+`src.valuation.data_snapshot` creates each historical row from information dated before the transfer: the latest prior market valuation and the prior 365 days of appearances. A leakage regression test verifies that same-player appearances on or after the transfer cannot enter the snapshot.
+
+Training is chronological: data before 2021-07-01 is used for fitting, 2021/22 is used for selection, and 2022-07-01 onward remains an untouched test window. The pipeline saves preprocessing with the model and records authentic test metrics in `models/model_metadata.json`.
+
+Two configurations are available: `performance_only` and `market_aware`. Scenario, player, and historical valuation endpoints load those same saved pipelines; there is no heuristic valuation fallback. Ridge explanations report the actual per-prediction contribution in log-fee space, not fabricated EUR premiums.
+
+The current source `transfers` table does not include a transfer-type column. Training therefore uses known positive-fee paid-transfer records as a documented proxy; it does not claim verified permanent-only coverage. Free, loan, undisclosed, and other transfer classifications cannot yet be determined from this database.
+
+### Estimator endpoints
+
+- `POST /api/estimator/predict` — hypothetical scenario, using a selected model configuration.
+- `GET /api/estimator/player/{player_id}` — current hypothetical value from a dated snapshot.
+- `POST /api/estimator/historical` — reproduce a historical prediction with `player_id` and SQLite `transfer_id`.
+- `GET /api/estimator/model-info` and `/api/estimator/models` — training periods, selected models, and validation/test metrics.
 
 ## ⚠️ Limitations
 

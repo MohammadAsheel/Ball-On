@@ -21,10 +21,10 @@ export function RightSidebar({ recentTransfers, modelMeta }: RightSidebarProps) 
   const recent5 = recentTransfers.slice(0, 5);
 
   // Find best model from benchmark
-  const bestModel = modelMeta
-    ? Object.values(modelMeta.models_benchmark).reduce(
-        (best, m) => (m.MAE < best.MAE ? m : best),
-        Object.values(modelMeta.models_benchmark)[0]
+  const bestModel = modelMeta && Object.entries(modelMeta.test_results).length > 0
+    ? Object.entries(modelMeta.test_results).reduce(
+        (best, current) => (current[1].mae_eur < best[1].mae_eur ? current : best),
+        Object.entries(modelMeta.test_results)[0]
       )
     : null;
 
@@ -139,30 +139,29 @@ export function RightSidebar({ recentTransfers, modelMeta }: RightSidebarProps) 
               <div className="p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.04] text-center">
                 <p className="text-[10px] text-slate-500 uppercase tracking-wider">R²</p>
                 <p className="text-sm font-bold text-white mt-0.5">
-                  {bestModel.R2.toFixed(3)}
+                  {bestModel[1].r2.toFixed(3)}
                 </p>
               </div>
               <div className="p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.04] text-center">
                 <p className="text-[10px] text-slate-500 uppercase tracking-wider">MAE</p>
                 <p className="text-sm font-bold text-white mt-0.5">
-                  {formatEUR(bestModel.MAE)}
+                  {formatEUR(bestModel[1].mae_eur)}
                 </p>
               </div>
               <div className="p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.04] text-center">
                 <p className="text-[10px] text-slate-500 uppercase tracking-wider">RMSE</p>
                 <p className="text-sm font-bold text-white mt-0.5">
-                  {formatEUR(bestModel.RMSE)}
+                  {formatEUR(bestModel[1].rmse_eur)}
                 </p>
               </div>
             </div>
             <div className="text-[10px] text-slate-500 space-y-0.5">
               <p>
-                <span className="text-slate-400">Model:</span> {bestModel.model_name}
+                <span className="text-slate-400">Model:</span> {bestModel[0]}
               </p>
               {modelMeta && (
                 <p>
-                  <span className="text-slate-400">Split:</span> Train before{' '}
-                  {modelMeta.split_date} • Test after
+                  <span className="text-slate-400">Test starts:</span> {modelMeta.periods.test_start}
                 </p>
               )}
             </div>

@@ -159,82 +159,48 @@ export interface PlayerProfile {
   };
 }
 
-export interface FeatureImpact {
+export interface ModelContribution {
   feature: string;
-  value: string;
-  effect: 'Positive' | 'Negative' | 'Neutral';
-  description: string;
+  contribution_log_fee: number;
+  direction: 'positive' | 'negative';
 }
 
-export interface ValuationPrediction {
-  player_name: string;
-  model_used: string;
-  estimated_transfer_value: number;
-  raw_prediction: number;
-  feature_impacts: FeatureImpact[];
-  inputs: {
-    name: string;
-    age: number;
-    position: string;
-    market_value_before: number;
-    prior_minutes: number;
-    goals: number;
-    assists: number;
-    use_market_value: boolean;
-  };
-}
-
-export interface PlayerEstimatorResult {
-  player: {
-    player_id: number;
-    name: string;
-    position: string;
-    market_value_in_eur: number;
-    age: number;
-  };
-  latest_transfer: {
-    transfer_date: string;
-    transfer_fee: number;
-    from_club_name: string;
-    to_club_name: string;
-  } | null;
-  stats: {
-    prior_minutes: number;
-    prior_goals: number;
-    prior_assists: number;
+export interface EstimatorResponse {
+  mode: 'player' | 'scenario' | 'historical';
+  label: string;
+  snapshot: Record<string, unknown> & {
+    player_name?: string;
+    age_at_transfer?: number;
+    position?: string;
+    market_value_before?: number | null;
+    prior_minutes?: number;
+    prior_goals?: number;
+    prior_assists?: number;
   };
   valuation: {
     estimated_transfer_value: number;
-    actual_transfer_fee: number | null;
-    market_value: number;
-    diff_vs_actual: number | null;
-    diff_vs_actual_pct: number | null;
-    diff_vs_market: number | null;
-    diff_vs_market_pct: number | null;
+    model_version: string;
+    model_type: string;
+    target_transform: string;
+    data_quality: { level: string; note: string };
+    model_explanation: { method: string; note: string; contributions: ModelContribution[] };
   };
-  model_used: string;
-  feature_impacts: FeatureImpact[];
+  actual_transfer_fee: number | null;
+  prediction_id?: number;
 }
 
 export interface ModelMetadata {
-  split_date: string;
-  train_samples: number;
-  test_samples: number;
-  models_benchmark: Record<
+  model_version: string;
+  periods: { test_start: string };
+  sample_counts: { test: number };
+  test_results: Record<
     string,
     {
-      model_name: string;
-      R2: number;
-      MAE: number;
-      RMSE: number;
+      mae_eur: number;
+      rmse_eur: number;
+      r2: number;
     }
   >;
-  market_aware_coefficients: Array<{
-    feature: string;
-    weight: number;
-    direction: string;
-    relative_importance: number;
-  }>;
 }
 
 export interface ComparedPlayer {

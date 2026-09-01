@@ -35,7 +35,7 @@ import {
 import { api } from '@/lib/api';
 import {
   PlayerProfile,
-  PlayerEstimatorResult,
+  EstimatorResponse,
   TransfermarktProfile,
 } from '@/lib/types';
 import { formatEUR, formatDate, formatNumber } from '@/lib/format';
@@ -44,7 +44,7 @@ import { CardSkeleton, TableSkeleton } from '@/components/ui/Skeleton';
 export default function PlayerProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [profile, setProfile] = useState<PlayerProfile | null>(null);
-  const [estimate, setEstimate] = useState<PlayerEstimatorResult | null>(null);
+  const [estimate, setEstimate] = useState<EstimatorResponse | null>(null);
   const [tmData, setTmData] = useState<TransfermarktProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [tmLoading, setTmLoading] = useState(false);
@@ -351,7 +351,7 @@ export default function PlayerProfilePage({ params }: { params: Promise<{ id: st
             <p className="text-2xl font-black text-sky-300">
               {estimate ? formatEUR(estimate.valuation.estimated_transfer_value) : 'Calculating...'}
             </p>
-            <p className="text-[10px] text-slate-400">BALLON Log-Target Ridge Regression</p>
+            <p className="text-[10px] text-slate-400">{estimate?.valuation.model_type || 'BALLON valuation model'}</p>
           </div>
 
           {/* Actual Transfer Fee */}
@@ -379,21 +379,8 @@ export default function PlayerProfilePage({ params }: { params: Promise<{ id: st
           {/* Difference */}
           <div className="p-4 rounded-xl bg-slate-900/60 border border-white/5 space-y-1">
             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Valuation Delta</p>
-            {estimate?.valuation.diff_vs_actual !== null && estimate?.valuation.diff_vs_actual !== undefined ? (
-              <>
-                <p className={`text-2xl font-black ${estimate.valuation.diff_vs_actual >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                  {estimate.valuation.diff_vs_actual >= 0 ? '+' : ''}{formatEUR(estimate.valuation.diff_vs_actual)}
-                </p>
-                <p className="text-[10px] text-slate-400">
-                  {estimate.valuation.diff_vs_actual_pct}% vs actual fee
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="text-2xl font-black text-slate-400">Not available</p>
-                <p className="text-[10px] text-slate-500">Requires paid transfer record</p>
-              </>
-            )}
+            <p className="text-2xl font-black text-slate-400">Not available</p>
+            <p className="text-[10px] text-slate-500">Use Historical Mode to compare against a selected transfer.</p>
           </div>
         </div>
       </div>
