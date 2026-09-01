@@ -10,6 +10,7 @@ const links = [
   { href: '/estimator', label: 'Valuation Engine' },
   { href: '/players', label: 'Players Catalog' },
   { href: '/live', label: 'Live League Feeds' },
+  { href: '/streams', label: 'Live Streams', isStream: true },
   { href: '/compare', label: 'Comparison Matrix' },
 ];
 
@@ -100,13 +101,23 @@ export function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`relative flex h-10 items-center rounded-lg px-3.5 text-xs font-semibold tracking-wide transition-all ${
+                  className={`relative flex h-10 items-center gap-1.5 rounded-lg px-3.5 text-xs font-semibold tracking-wide transition-all ${
                     active
                       ? 'bg-white/[0.08] text-white shadow-sm'
                       : 'text-slate-400 hover:bg-white/[0.04] hover:text-white'
                   }`}
                 >
-                  {link.label}
+                  {link.isStream && (
+                    <span className="flex h-2 w-2 items-center justify-center">
+                      <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-ping" />
+                    </span>
+                  )}
+                  <span>{link.label}</span>
+                  {link.isStream && (
+                    <span className="mono-font rounded border border-rose-500/40 bg-rose-500/20 px-1 py-0.2 text-[8px] font-bold text-rose-300">
+                      LIVE
+                    </span>
+                  )}
                   {active && (
                     <span className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-cyan-400 shadow-[0_0_8px_#00f2fe]" />
                   )}

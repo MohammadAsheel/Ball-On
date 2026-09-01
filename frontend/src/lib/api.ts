@@ -14,9 +14,13 @@ import {
   SportMonksMatch,
   SportMonksMatchesResponse,
   TransfermarktLiveResponse,
-  TransfermarktProfile,
-  BigBallsMatch,
   BigBallsMatchesResponse,
+  ApiFootballInjuriesResponse,
+  ApiFootballScorersResponse,
+  ApiFootballAssistsResponse,
+  LiveApiStatusResponse,
+  FootballNewsResponse,
+  FootballNewsArticle,
 } from './types';
 
 const API_BASE_URL =
@@ -123,7 +127,78 @@ export const api = {
   // Clubs
   getClubs: (limit = 20) => fetchJSON<ClubsData>(`/api/clubs?limit=${limit}`),
 
-  // Live (Football-Data.org)
+  // API-Football / API-Sports REST Endpoints
+  getInjuries: (params?: {
+    league?: number;
+    season?: number;
+    team?: number;
+    player?: number;
+    date?: string;
+    limit?: number;
+  }) => {
+    const q = new URLSearchParams();
+    if (params?.league !== undefined) q.append('league', String(params.league));
+    if (params?.season !== undefined) q.append('season', String(params.season));
+    if (params?.team !== undefined) q.append('team', String(params.team));
+    if (params?.player !== undefined) q.append('player', String(params.player));
+    if (params?.date) q.append('date', params.date);
+    if (params?.limit !== undefined) q.append('limit', String(params.limit));
+    return fetchJSON<ApiFootballInjuriesResponse>(`/api/live/injuries?${q.toString()}`);
+  },
+
+  getApiFootballTopScorers: (params?: { league?: number; season?: number; limit?: number }) => {
+    const q = new URLSearchParams();
+    if (params?.league !== undefined) q.append('league', String(params.league));
+    if (params?.season !== undefined) q.append('season', String(params.season));
+    if (params?.limit !== undefined) q.append('limit', String(params.limit));
+    return fetchJSON<ApiFootballScorersResponse>(`/api/live/topscorers?${q.toString()}`);
+  },
+
+  getApiFootballTopAssists: (params?: { league?: number; season?: number; limit?: number }) => {
+    const q = new URLSearchParams();
+    if (params?.league !== undefined) q.append('league', String(params.league));
+    if (params?.season !== undefined) q.append('season', String(params.season));
+    if (params?.limit !== undefined) q.append('limit', String(params.limit));
+    return fetchJSON<ApiFootballAssistsResponse>(`/api/live/topassists?${q.toString()}`);
+  },
+
+  getApiFootballFixtures: (params?: {
+    live?: boolean;
+    date?: string;
+    league?: number;
+    season?: number;
+  }) => {
+    const q = new URLSearchParams();
+    if (params?.live !== undefined) q.append('live', String(params.live));
+    if (params?.date) q.append('date', params.date);
+    if (params?.league !== undefined) q.append('league', String(params.league));
+    if (params?.season !== undefined) q.append('season', String(params.season));
+    return fetchJSON<{ count: number; matches: any[] }>(`/api/live/apifootball/fixtures?${q.toString()}`);
+  },
+
+  searchApiFootballPlayers: (query: string, league?: number, season = 2024) => {
+    const q = new URLSearchParams();
+    q.append('query', query);
+    if (league !== undefined) q.append('league', String(league));
+    q.append('season', String(season));
+    return fetchJSON<{ query: string; count: number; players: any[] }>(
+      `/api/live/apifootball/search?${q.toString()}`
+    );
+  },
+
+  getApiFootballTransfers: (params: { player_id?: number; team_id?: number }) => {
+    const q = new URLSearchParams();
+    if (params.player_id !== undefined) q.append('player_id', String(params.player_id));
+    if (params.team_id !== undefined) q.append('team_id', String(params.team_id));
+    return fetchJSON<{ count: number; transfers: any[] }>(
+      `/api/live/apifootball/transfers?${q.toString()}`
+    );
+  },
+
+  // Live API Status
+  getLiveStatus: () => fetchJSON<LiveApiStatusResponse>('/api/live/status'),
+
+  // Football-Data.org Compatibility Endpoints
   getLiveStandings: (code: string) =>
     fetchJSON<{ competition: any; season: any; table: StandingRow[] }>(
       `/api/live/standings/${code}`
@@ -140,13 +215,6 @@ export const api = {
     ),
 
   // Live (SportMonks v3)
-  getLiveStatus: () =>
-    fetchJSON<{
-      sportmonks_configured: boolean;
-      football_data_org_configured: boolean;
-      rapidapi_configured: boolean;
-    }>('/api/live/status'),
-
   getSportMonksLiveScores: (inplay_only = false) =>
     fetchJSON<SportMonksMatchesResponse>(
       `/api/live/livescores?inplay_only=${inplay_only}`
@@ -185,22 +253,56 @@ export const api = {
       `/api/players/live-transfermarkt/search?q=${encodeURIComponent(query)}&refresh=${refresh}`
     ),
 
-  // BigBallsData SDK Match Intelligence (/api/matches route)
+  // BigBallsData SDK Match Intelligence (/api/live/bigballs/matches route)
   getBigBallsMatches: async (params?: { league?: string; status?: string; limit?: number; date?: string }) => {
     const q = new URLSearchParams();
-    if (params?.league) q.append('league', params.league);
-    if (params?.status) q.append('status', params.status);
+    if (params?.league && params.league !== 'all') q.append('league', params.league);
+    if (params?.status && params.status !== 'all') q.append('status', params.status);
     if (params?.limit !== undefined) q.append('limit', String(params.limit));
     if (params?.date) q.append('date', params.date);
 
-    const url = `/api/matches?${q.toString()}`;
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) {
-      throw new Error(`Failed to fetch BigBalls matches: ${res.statusText}`);
+    try {
+      return await fetchJSON<BigBallsMatchesResponse>(`/api/live/bigballs/matches?${q.toString()}`);
+    } catch (err) {
+      // Fallback to Next.js route handler
+      try {
+        const res = await fetch(`/api/matches?${q.toString()}`, { cache: 'no-store' });
+        if (res.ok) return await res.json();
+      } catch (_) {}
+      return { count: 0, data: [], error: null } as BigBallsMatchesResponse;
     }
-    return (await res.json()) as BigBallsMatchesResponse;
+  },
+
+  // Real-Time RSS News Aggregator (BBC, Sky, Guardian, ESPN)
+  getNews: (params?: {
+    category?: string;
+    query?: string;
+    source?: string;
+    limit?: number;
+    refresh?: boolean;
+  }) => {
+    const q = new URLSearchParams();
+    if (params?.category) q.append('category', params.category);
+    if (params?.query) q.append('query', params.query);
+    if (params?.source) q.append('source', params.source);
+    if (params?.limit !== undefined) q.append('limit', String(params.limit));
+    if (params?.refresh) q.append('refresh', 'true');
+    return fetchJSON<FootballNewsResponse>(`/api/news?${q.toString()}`);
+  },
+
+  getTransferNews: (params?: { query?: string; limit?: number; refresh?: boolean }) => {
+    const q = new URLSearchParams();
+    if (params?.query) q.append('query', params.query);
+    if (params?.limit !== undefined) q.append('limit', String(params.limit));
+    if (params?.refresh) q.append('refresh', 'true');
+    return fetchJSON<FootballNewsResponse>(`/api/news/transfers?${q.toString()}`);
+  },
+
+  getInjuryNews: (params?: { query?: string; limit?: number; refresh?: boolean }) => {
+    const q = new URLSearchParams();
+    if (params?.query) q.append('query', params.query);
+    if (params?.limit !== undefined) q.append('limit', String(params.limit));
+    if (params?.refresh) q.append('refresh', 'true');
+    return fetchJSON<FootballNewsResponse>(`/api/news/injuries?${q.toString()}`);
   },
 };
-
-
-

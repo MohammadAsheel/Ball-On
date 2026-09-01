@@ -572,4 +572,134 @@ export interface BigBallsMatchesResponse {
   error?: string | null;
 }
 
+// ──────────────────────────────────────────────
+// API-Football / API-Sports Types
+// ──────────────────────────────────────────────
 
+export interface ApiFootballInjuryPlayer {
+  id: number;
+  name: string;
+  photo: string;
+  type: string;
+  reason: string;
+}
+
+export interface ApiFootballInjuryTeam {
+  id: number;
+  name: string;
+  logo: string;
+}
+
+export interface ApiFootballInjuryFixture {
+  id: number;
+  timezone: string;
+  date: string;
+  timestamp: number;
+}
+
+export interface ApiFootballInjuryLeague {
+  id: number;
+  season: number;
+  name: string;
+  country: string;
+  logo: string;
+  flag: string;
+}
+
+export interface ApiFootballInjury {
+  player: ApiFootballInjuryPlayer;
+  team: ApiFootballInjuryTeam;
+  fixture: ApiFootballInjuryFixture;
+  league: ApiFootballInjuryLeague;
+}
+
+export interface ApiFootballInjuriesResponse {
+  count: number;
+  total_available: number;
+  league_id: number;
+  season: number;
+  injuries: ApiFootballInjury[];
+}
+
+export interface ApiFootballPlayerStat {
+  player: {
+    id: number;
+    name: string;
+    firstname?: string;
+    lastname?: string;
+    age?: number;
+    birth?: { date: string; place: string; country: string };
+    nationality?: string;
+    height?: string;
+    weight?: string;
+    injured?: boolean;
+    photo?: string;
+  };
+  statistics: Array<{
+    team: { id: number; name: string; logo: string };
+    league: { id: number; name: string; country: string; logo: string; flag: string; season: number };
+    games: { appearences: number; lineups: number; minutes: number; position: string; rating?: string };
+    goals: { total: number; assists?: number; conceded?: number; saves?: number };
+    passes?: { total: number; key: number; accuracy: number };
+    cards?: { yellow: number; yellowred: number; red: number };
+  }>;
+}
+
+export interface ApiFootballScorersResponse {
+  league_id: number;
+  season: number;
+  count: number;
+  scorers: ApiFootballPlayerStat[];
+}
+
+export interface ApiFootballAssistsResponse {
+  league_id: number;
+  season: number;
+  count: number;
+  assists: ApiFootballPlayerStat[];
+}
+
+export interface LiveApiStatusResponse {
+  sportmonks_configured: boolean;
+  football_data_org_configured: boolean;
+  api_football_configured: boolean;
+  api_football_status?: {
+    account?: { firstname: string; lastname: string; email: string };
+    subscription?: { plan: string; end: string; active: boolean };
+    requests?: { current: number; limit_day: number };
+  } | null;
+}
+
+// ──────────────────────────────────────────────
+// Real-Time RSS News Aggregator Types
+// ──────────────────────────────────────────────
+
+export interface FootballNewsArticle {
+  id: string;
+  title: string;
+  description: string;
+  link: string;
+  published_at: string;
+  timestamp: number;
+  source: string;
+  source_badge: string;
+  source_color: string;
+  category: 'transfers' | 'injuries' | 'matches' | 'general' | string;
+  category_label: string;
+  image_url?: string | null;
+}
+
+export interface FootballNewsResponse {
+  count: number;
+  total_available: number;
+  categories: {
+    all: number;
+    transfers: number;
+    injuries: number;
+    matches: number;
+    general: number;
+  };
+  cached: boolean;
+  last_updated?: string | null;
+  articles: FootballNewsArticle[];
+}

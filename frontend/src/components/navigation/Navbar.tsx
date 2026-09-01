@@ -11,6 +11,7 @@ import {
   Calculator,
   Shield,
   Globe,
+  Tv,
 } from 'lucide-react';
 
 export function Navbar() {
@@ -24,6 +25,7 @@ export function Navbar() {
     { href: '/estimator', label: 'Transfer Estimator', icon: Calculator },
     { href: '/clubs', label: 'Clubs & Stadiums', icon: Shield },
     { href: '/live', label: 'Live Data', icon: Globe },
+    { href: '/streams', label: 'Live TV', icon: Tv },
   ];
 
   return (

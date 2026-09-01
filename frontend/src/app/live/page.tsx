@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import {
   Globe,
   Trophy,
@@ -21,8 +22,16 @@ import {
   Zap,
   Tv,
   Coins,
+  Stethoscope,
+  Newspaper,
+  Radio,
+  Play,
+  Video,
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { InjuriesTicker } from '@/components/live/InjuriesTicker';
+import { NewsFeed } from '@/components/news/NewsFeed';
+import { LaLigaStreamModal, LALIGA_STREAM_URL } from '@/components/live/LaLigaStreamModal';
 import {
   StandingRow,
   ScorerRow,
@@ -55,7 +64,7 @@ const BBS_LEAGUES = [
   { code: 'ucl', name: 'Champions League', flag: '🇪🇺' },
 ];
 
-type MainTab = 'bigballs' | 'livescores' | 'fixtures' | 'finished' | 'standings';
+type MainTab = 'bigballs' | 'news' | 'injuries' | 'livescores' | 'fixtures' | 'finished' | 'standings';
 
 export default function LiveDataPage() {
   const [activeTab, setActiveTab] = useState<MainTab>('bigballs');
@@ -80,7 +89,26 @@ export default function LiveDataPage() {
   const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
   const [matchDetails, setMatchDetails] = useState<SportMonksMatch | null>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
-  const [modalTab, setModalTab] = useState<'timeline' | 'stats' | 'lineups' | 'info'>('timeline');
+  const [modalTab, setModalTab] = useState<'timeline' | 'stats' | 'lineups' | 'stream' | 'info'>('timeline');
+
+  // La Liga Live Stream Modal State
+  const [streamModalOpen, setStreamModalOpen] = useState(false);
+  const [streamMatchInfo, setStreamMatchInfo] = useState<{
+    title?: string;
+    home?: string;
+    away?: string;
+    score?: string;
+  }>({});
+
+  const openLaLigaStream = (info?: { home?: string; away?: string; score?: string; title?: string }) => {
+    setStreamMatchInfo({
+      home: info?.home,
+      away: info?.away,
+      score: info?.score,
+      title: info?.title || 'La Liga Santander Live Broadcast',
+    });
+    setStreamModalOpen(true);
+  };
 
   // Football-Data.org Standings States
   const [selectedFdLeague, setSelectedFdLeague] = useState('PL');
@@ -238,7 +266,7 @@ export default function LiveDataPage() {
             Live Matches & Fixtures Intelligence
           </h1>
           <p className="text-xs text-[#888] mt-1">
-            Real-time live scores, multi-league fixtures via BigBallSports SDK, match statistics, lineups, and standings.
+            Real-time live scores, multi-league fixtures via BigBallSports SDK, API-Football squad injury wire, match statistics, and standings.
           </p>
         </div>
 
@@ -272,6 +300,32 @@ export default function LiveDataPage() {
             <span className="mono-font ml-1 rounded bg-[#222] px-1.5 py-0.2 text-[10px] text-white">
               {bbsMatches.length}
             </span>
+          </button>
+
+          {/* Breaking Football News Stream (RSS Aggregator) */}
+          <button
+            onClick={() => setActiveTab('news')}
+            className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold tracking-wide border transition ${
+              activeTab === 'news'
+                ? 'border-cyan-400 bg-cyan-400/15 text-cyan-300'
+                : 'border-[#333] bg-[#111] text-[#888] hover:text-white'
+            }`}
+          >
+            <Newspaper size={14} className="text-cyan-400" />
+            <span>News & Transfer Wire</span>
+          </button>
+
+          {/* Squad Availability & Injuries Wire (API-Football) */}
+          <button
+            onClick={() => setActiveTab('injuries')}
+            className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold tracking-wide border transition ${
+              activeTab === 'injuries'
+                ? 'border-rose-500 bg-rose-500/15 text-rose-300'
+                : 'border-[#333] bg-[#111] text-[#888] hover:text-white'
+            }`}
+          >
+            <Stethoscope size={14} className="text-rose-400" />
+            <span>Injury & Medical Wire</span>
           </button>
 
           {/* SportMonks Live Scores */}
@@ -424,6 +478,34 @@ export default function LiveDataPage() {
                 </div>
               </div>
 
+              {/* LIVE BROADCAST TV HUB BANNER */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-rose-500/40 bg-gradient-to-r from-rose-950/40 via-[#101522] to-black p-4 shadow-[0_0_25px_rgba(244,63,94,0.15)]">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-rose-500/50 bg-rose-500/20 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.3)]">
+                    <Tv size={20} className="animate-pulse" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="mono-font rounded border border-rose-500/50 bg-rose-500/25 px-2 py-0.5 text-[9px] font-bold text-rose-300 uppercase tracking-widest flex items-center gap-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-ping" />
+                        LIVE TV HUB
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono">Channel: LaLiga TV HD (1080p 60FPS)</span>
+                    </div>
+                    <h4 className="display-font text-sm sm:text-base font-bold text-white">
+                      Live Television Broadcast Channels
+                    </h4>
+                  </div>
+                </div>
+                <Link
+                  href="/streams"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-rose-500/60 bg-rose-500 px-4 py-2 text-xs font-bold text-white shadow-[0_0_20px_rgba(244,63,94,0.4)] hover:bg-rose-600 transition hover:scale-105 active:scale-95 shrink-0"
+                >
+                  <Play size={13} fill="currentColor" />
+                  <span>Open Live TV Streams</span>
+                </Link>
+              </div>
+
               {/* Match Cards Grid */}
               {bbsLoading ? (
                 <div className="space-y-4">
@@ -452,11 +534,29 @@ export default function LiveDataPage() {
 
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                     {filteredBbsMatches.map((match, idx) => (
-                      <BigBallsMatchCard key={`${match.id || 'bbs'}-${idx}`} match={match} />
+                      <BigBallsMatchCard
+                        key={`${match.id || 'bbs'}-${idx}`}
+                        match={match}
+                        onOpenStream={openLaLigaStream}
+                      />
                     ))}
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB: GLOBAL FOOTBALL NEWS & TRANSFER WIRE (RSS Aggregator) */}
+          {activeTab === 'news' && (
+            <div className="space-y-6">
+              <NewsFeed />
+            </div>
+          )}
+
+          {/* TAB: SQUAD AVAILABILITY & INJURIES WIRE (API-Football) */}
+          {activeTab === 'injuries' && (
+            <div className="space-y-6">
+              <InjuriesTicker />
             </div>
           )}
 
@@ -496,7 +596,13 @@ export default function LiveDataPage() {
               ) : (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {filteredLive.map((m, idx) => (
-                    <MatchCard key={`${m.id || 'live'}-${idx}`} match={m} onOpen={openMatchCenter} type="live" />
+                    <MatchCard
+                      key={`${m.id || 'live'}-${idx}`}
+                      match={m}
+                      onOpen={openMatchCenter}
+                      onOpenStream={openLaLigaStream}
+                      type="live"
+                    />
                   ))}
                 </div>
               )}
@@ -537,7 +643,13 @@ export default function LiveDataPage() {
               ) : (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {filteredFixtures.map((m, idx) => (
-                    <MatchCard key={`${m.id || 'fix'}-${idx}`} match={m} onOpen={openMatchCenter} type="fixture" />
+                    <MatchCard
+                      key={`${m.id || 'fix'}-${idx}`}
+                      match={m}
+                      onOpen={openMatchCenter}
+                      onOpenStream={openLaLigaStream}
+                      type="fixture"
+                    />
                   ))}
                 </div>
               )}
@@ -578,7 +690,13 @@ export default function LiveDataPage() {
               ) : (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {filteredFinished.map((m, idx) => (
-                    <MatchCard key={`${m.id || 'fin'}-${idx}`} match={m} onOpen={openMatchCenter} type="finished" />
+                    <MatchCard
+                      key={`${m.id || 'fin'}-${idx}`}
+                      match={m}
+                      onOpen={openMatchCenter}
+                      onOpenStream={openLaLigaStream}
+                      type="finished"
+                    />
                   ))}
                 </div>
               )}
@@ -834,6 +952,9 @@ export default function LiveDataPage() {
                 { id: 'timeline', label: 'Match Events', icon: Activity },
                 { id: 'stats', label: 'Head-to-Head Stats', icon: BarChart2 },
                 { id: 'lineups', label: 'Squad Lineups', icon: Users },
+                ...(isLaLigaMatch(matchDetails.league?.name, matchDetails.name)
+                  ? [{ id: 'stream', label: '🔴 Live Stream', icon: Video }]
+                  : []),
               ].map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -842,11 +963,13 @@ export default function LiveDataPage() {
                     onClick={() => setModalTab(tab.id as any)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 border text-xs font-semibold transition ${
                       modalTab === tab.id
-                        ? 'border-[#00f2fe] bg-[#00f2fe]/15 text-[#00f2fe]'
+                        ? tab.id === 'stream'
+                          ? 'border-rose-500 bg-rose-500/15 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.3)]'
+                          : 'border-[#00f2fe] bg-[#00f2fe]/15 text-[#00f2fe]'
                         : 'border-[#333] text-[#888] hover:text-white'
                     }`}
                   >
-                    <Icon size={13} />
+                    <Icon size={13} className={tab.id === 'stream' ? 'text-rose-400 animate-pulse' : ''} />
                     <span>{tab.label}</span>
                   </button>
                 );
@@ -861,6 +984,43 @@ export default function LiveDataPage() {
               </div>
             ) : (
               <div className="space-y-4">
+                {/* 0. LIVE STREAM TAB (La Liga) */}
+                {modalTab === 'stream' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-rose-400 font-bold flex items-center gap-1.5">
+                        <Radio size={14} className="animate-pulse" /> Official La Liga HD Broadcast Stream
+                      </span>
+                      <button
+                        onClick={() =>
+                          openLaLigaStream({
+                            home: matchDetails.home_team.name,
+                            away: matchDetails.away_team.name,
+                            score:
+                              matchDetails.score.home !== null
+                                ? `${matchDetails.score.home} - ${matchDetails.score.away}`
+                                : undefined,
+                            title: `${matchDetails.home_team.name} vs ${matchDetails.away_team.name} (La Liga Live Stream)`,
+                          })
+                        }
+                        className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1"
+                      >
+                        <span>Theater Mode</span>
+                        <Play size={11} fill="currentColor" />
+                      </button>
+                    </div>
+
+                    <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-rose-500/40 bg-black shadow-[0_0_30px_rgba(244,63,94,0.2)]">
+                      <iframe
+                        src={LALIGA_STREAM_URL}
+                        className="h-full w-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                        allowFullScreen
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {/* 1. TIMELINE */}
                 {modalTab === 'timeline' && (
                   <div className="space-y-2">
@@ -995,15 +1155,44 @@ export default function LiveDataPage() {
           </div>
         </div>
       )}
+
+      {/* LA LIGA LIVE STREAM BROADCAST THEATER MODAL */}
+      <LaLigaStreamModal
+        isOpen={streamModalOpen}
+        onClose={() => setStreamModalOpen(false)}
+        matchTitle={streamMatchInfo.title}
+        homeTeam={streamMatchInfo.home}
+        awayTeam={streamMatchInfo.away}
+        scoreDisplay={streamMatchInfo.score}
+      />
     </div>
   );
 }
 
 // ──────────────────────────────────────────────
-// Helper Components
+// Helper Functions & Components
 // ──────────────────────────────────────────────
 
-function BigBallsMatchCard({ match }: { match: BigBallsMatch }) {
+function isLaLigaMatch(leagueName?: string, matchName?: string): boolean {
+  const text = `${leagueName || ''} ${matchName || ''}`.toLowerCase();
+  return (
+    text.includes('laliga') ||
+    text.includes('la liga') ||
+    text.includes('primera') ||
+    text.includes('esp-') ||
+    text.includes('spain') ||
+    text.includes('españa') ||
+    text.includes('santander')
+  );
+}
+
+function BigBallsMatchCard({
+  match,
+  onOpenStream,
+}: {
+  match: BigBallsMatch;
+  onOpenStream?: (info: { home?: string; away?: string; score?: string; title?: string }) => void;
+}) {
   const isLive = match.status === 'live' || match.status === 'in_progress';
   const isFinished = match.status === 'finished';
   const isScheduled = match.status === 'scheduled';
@@ -1013,6 +1202,7 @@ function BigBallsMatchCard({ match }: { match: BigBallsMatch }) {
   const awayName = match.away?.name || 'Away Team';
   const homeShort = match.home?.short_name || (match.home?.name ? match.home.name.slice(0, 3).toUpperCase() : 'H');
   const awayShort = match.away?.short_name || (match.away?.name ? match.away.name.slice(0, 3).toUpperCase() : 'A');
+  const isLaLiga = isLaLigaMatch(match.league, `${homeName} ${awayName}`);
 
   const kickoffFormatted = match.kickoff_utc
     ? new Date(match.kickoff_utc).toLocaleString('en-GB', {
@@ -1024,11 +1214,21 @@ function BigBallsMatchCard({ match }: { match: BigBallsMatch }) {
     : 'Scheduled';
 
   return (
-    <div className="terminal-card p-4 space-y-4 hover:border-[#444] transition group">
+    <div
+      className={`terminal-card p-4 space-y-4 hover:border-[#444] transition group ${
+        isLaLiga ? 'border-rose-900/40 bg-gradient-to-b from-[#11141e] to-[#0c1018]' : ''
+      }`}
+    >
       {/* Header with League & Status */}
       <div className="flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
-          <span className="mono-font border border-[#00f2fe]/40 bg-[#00f2fe]/10 px-2 py-0.5 text-[10px] font-semibold text-[#00f2fe]">
+          <span
+            className={`mono-font border px-2 py-0.5 text-[10px] font-semibold ${
+              isLaLiga
+                ? 'border-rose-500/50 bg-rose-500/15 text-rose-300'
+                : 'border-[#00f2fe]/40 bg-[#00f2fe]/10 text-[#00f2fe]'
+            }`}
+          >
             {leagueLabel}
           </span>
           {match.broadcast && (
@@ -1038,19 +1238,21 @@ function BigBallsMatchCard({ match }: { match: BigBallsMatch }) {
           )}
         </div>
 
-        {isLive ? (
-          <span className="flex items-center gap-1 mono-font border border-[#ff3366]/40 bg-[#ff3366]/15 px-2 py-0.5 text-[10px] font-bold text-[#ff3366]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#ff3366] animate-pulse" /> LIVE
-          </span>
-        ) : isFinished ? (
-          <span className="mono-font border border-[#10b981]/30 bg-[#10b981]/10 px-2 py-0.5 text-[10px] font-bold text-[#10b981]">
-            FT
-          </span>
-        ) : (
-          <span className="mono-font border border-[#333] bg-[#1a1a1a] px-2 py-0.5 text-[10px] text-[#888]">
-            {kickoffFormatted}
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {isLive ? (
+            <span className="flex items-center gap-1 mono-font border border-[#ff3366]/40 bg-[#ff3366]/15 px-2 py-0.5 text-[10px] font-bold text-[#ff3366]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#ff3366] animate-pulse" /> LIVE
+            </span>
+          ) : isFinished ? (
+            <span className="mono-font border border-[#10b981]/30 bg-[#10b981]/10 px-2 py-0.5 text-[10px] font-bold text-[#10b981]">
+              FT
+            </span>
+          ) : (
+            <span className="mono-font border border-[#333] bg-[#1a1a1a] px-2 py-0.5 text-[10px] text-[#888]">
+              {kickoffFormatted}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Teams & Scoreline */}
@@ -1111,11 +1313,20 @@ function BigBallsMatchCard({ match }: { match: BigBallsMatch }) {
           <span>{kickoffFormatted}</span>
         </span>
 
-        {match.has_odds && (
+        {isLaLiga ? (
+          <Link
+            href="/streams"
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1.5 rounded-lg border border-rose-500/60 bg-rose-500/20 px-2.5 py-1 text-[11px] font-bold text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.3)] hover:bg-rose-500 hover:text-white transition"
+          >
+            <Tv size={12} className="text-rose-400 animate-pulse" />
+            <span>Live TV</span>
+          </Link>
+        ) : match.has_odds ? (
           <span className="flex items-center gap-1 text-[10px] text-[#f59e0b] border border-[#f59e0b]/20 bg-[#f59e0b]/10 px-1.5 py-0.2 rounded">
             <Coins size={10} /> Odds Active
           </span>
-        )}
+        ) : null}
       </div>
     </div>
   );
@@ -1124,20 +1335,32 @@ function BigBallsMatchCard({ match }: { match: BigBallsMatch }) {
 function MatchCard({
   match,
   onOpen,
+  onOpenStream,
   type,
 }: {
   match: SportMonksMatch;
   onOpen: (match: SportMonksMatch) => void;
+  onOpenStream?: (info: { home?: string; away?: string; score?: string; title?: string }) => void;
   type: 'live' | 'fixture' | 'finished';
 }) {
+  const isLaLiga = isLaLigaMatch(match.league?.name, match.name);
+
   return (
     <div
       onClick={() => onOpen(match)}
-      className="terminal-card p-4 space-y-4 hover:border-[#444] cursor-pointer transition group"
+      className={`terminal-card p-4 space-y-4 hover:border-[#444] cursor-pointer transition group ${
+        isLaLiga ? 'border-rose-900/30 bg-gradient-to-b from-[#11141e] to-[#0c1018]' : ''
+      }`}
     >
       {/* Card Header */}
       <div className="flex items-center justify-between text-xs">
-        <span className="mono-font border border-[#00f2fe]/40 bg-[#00f2fe]/10 px-2 py-0.5 text-[10px] tracking-wider text-[#00f2fe]">
+        <span
+          className={`mono-font border px-2 py-0.5 text-[10px] tracking-wider ${
+            isLaLiga
+              ? 'border-rose-500/50 bg-rose-500/15 text-rose-300'
+              : 'border-[#00f2fe]/40 bg-[#00f2fe]/10 text-[#00f2fe]'
+          }`}
+        >
           {match.league.name}
         </span>
 
@@ -1232,9 +1455,22 @@ function MatchCard({
           )}
         </div>
 
-        <span className="text-[#00f2fe] flex items-center gap-0.5 group-hover:translate-x-0.5 transition">
-          Match Center <ChevronRight size={12} />
-        </span>
+        <div className="flex items-center gap-2">
+          {isLaLiga && (
+            <Link
+              href="/streams"
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-1 rounded-md border border-rose-500/60 bg-rose-500/20 px-2 py-0.5 text-[10px] font-bold text-rose-300 hover:bg-rose-500 hover:text-white transition"
+            >
+              <Tv size={10} className="text-rose-400 animate-pulse" />
+              <span>Live TV</span>
+            </Link>
+          )}
+
+          <span className="text-[#00f2fe] flex items-center gap-0.5 group-hover:translate-x-0.5 transition">
+            Match Center <ChevronRight size={12} />
+          </span>
+        </div>
       </div>
     </div>
   );
