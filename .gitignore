@@ -88,3 +88,16 @@ models/*.json
 .DS_Store
 Thumbs.db
 desktop.ini
+
+
+# Backend secrets
+backend/.env
+
+# Large local datasets
+backend/data/raw/*
+backend/db/*.db
+
+# Generated ML artifacts
+backend/models/*.joblib
+
+
