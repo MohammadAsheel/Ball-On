@@ -1,0 +1,158 @@
+{
+  "model_version": "ballon-valuation-v2",
+  "training_date": "2026-09-01T04:53:51.810028+00:00",
+  "dataset_version": "transfermarkt-sqlite-source",
+  "as_of_date": "2026-09-01",
+  "transfer_type_limitation": "The source transfers table has no transfer_type column. Training rows are known positive-fee paid-transfer proxies, not verified permanent-only transfers.",
+  "target": "log1p(transfer_fee_eur)",
+  "random_seed": 42,
+  "periods": {
+    "train_end_exclusive": "2021-07-01",
+    "validation": [
+      "2021-07-01",
+      "2022-07-01"
+    ],
+    "test_start": "2022-07-01"
+  },
+  "sample_counts": {
+    "all_paid_transfer_proxies": 17550,
+    "train": 7571,
+    "validation": 1352,
+    "test": 8627
+  },
+  "validation_results": {
+    "mean_baseline": {
+      "mae_eur": 4903821.38,
+      "rmse_eur": 8592608.08,
+      "r2": -0.0128,
+      "median_absolute_error_eur": 4130148.12
+    },
+    "median_baseline": {
+      "mae_eur": 3488556.21,
+      "rmse_eur": 8876036.93,
+      "r2": -0.0807,
+      "median_absolute_error_eur": 1250000.0
+    },
+    "linear_performance_only": {
+      "mae_eur": 3233280.72,
+      "rmse_eur": 7798357.72,
+      "r2": 0.1658,
+      "median_absolute_error_eur": 951035.62
+    },
+    "ridge_performance_only": {
+      "mae_eur": 3232353.83,
+      "rmse_eur": 7798417.75,
+      "r2": 0.1658,
+      "median_absolute_error_eur": 949428.34
+    },
+    "elastic_net_performance_only": {
+      "mae_eur": 3208309.45,
+      "rmse_eur": 7801949.82,
+      "r2": 0.165,
+      "median_absolute_error_eur": 926619.06
+    },
+    "random_forest_performance_only": {
+      "mae_eur": 3166214.33,
+      "rmse_eur": 7466802.49,
+      "r2": 0.2352,
+      "median_absolute_error_eur": 1211862.6
+    },
+    "ridge_market_aware": {
+      "mae_eur": 1918071.46,
+      "rmse_eur": 4549364.52,
+      "r2": 0.7161,
+      "median_absolute_error_eur": 706747.24
+    }
+  },
+  "test_results": {
+    "mean_baseline": {
+      "mae_eur": 5472353.39,
+      "rmse_eur": 9888510.39,
+      "r2": -0.0,
+      "median_absolute_error_eur": 4140648.12
+    },
+    "median_baseline": {
+      "mae_eur": 4316426.24,
+      "rmse_eur": 10436018.4,
+      "r2": -0.1138,
+      "median_absolute_error_eur": 1250000.0
+    },
+    "linear_performance_only": {
+      "mae_eur": 3989011.53,
+      "rmse_eur": 9262364.26,
+      "r2": 0.1226,
+      "median_absolute_error_eur": 1093161.75
+    },
+    "ridge_performance_only": {
+      "mae_eur": 3988734.05,
+      "rmse_eur": 9263807.04,
+      "r2": 0.1223,
+      "median_absolute_error_eur": 1092427.9
+    },
+    "elastic_net_performance_only": {
+      "mae_eur": 3979363.08,
+      "rmse_eur": 9302297.92,
+      "r2": 0.115,
+      "median_absolute_error_eur": 1085360.99
+    },
+    "random_forest_performance_only": {
+      "mae_eur": 3932693.09,
+      "rmse_eur": 9142123.29,
+      "r2": 0.1452,
+      "median_absolute_error_eur": 1273482.27
+    },
+    "ridge_market_aware": {
+      "mae_eur": 2371062.28,
+      "rmse_eur": 5470608.53,
+      "r2": 0.6939,
+      "median_absolute_error_eur": 750161.71
+    }
+  },
+  "selected_models": {
+    "performance_only": "random_forest_performance_only",
+    "market_aware": "ridge_market_aware"
+  },
+  "artifacts": {
+    "performance_only": {
+      "model_name": "random_forest_performance_only",
+      "path": "valuation_performance_only.joblib",
+      "features": [
+        "age_at_transfer",
+        "prior_minutes",
+        "goals_per_90",
+        "assists_per_90",
+        "position"
+      ]
+    },
+    "market_aware": {
+      "model_name": "ridge_market_aware",
+      "path": "valuation_market_aware.joblib",
+      "features": [
+        "age_at_transfer",
+        "prior_minutes",
+        "goals_per_90",
+        "assists_per_90",
+        "position",
+        "log_market_value_before"
+      ]
+    }
+  },
+  "feature_schema": {
+    "performance_only": [
+      "age_at_transfer",
+      "prior_minutes",
+      "goals_per_90",
+      "assists_per_90",
+      "position"
+    ],
+    "market_aware": [
+      "age_at_transfer",
+      "prior_minutes",
+      "goals_per_90",
+      "assists_per_90",
+      "position",
+      "log_market_value_before"
+    ]
+  },
+  "data_quality_method": "Completeness score based on pre-snapshot market value, position, age, and at least 270 pre-transfer minutes; this is not prediction confidence."
+}

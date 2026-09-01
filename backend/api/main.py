@@ -20,10 +20,15 @@ app = FastAPI(
     version="2.0.0",
 )
 
-# CORS for local development (Next.js port 3000)
+# CORS for frontend (Next.js)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://your-ballon-domain.com",
+        "https://ball-on.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
