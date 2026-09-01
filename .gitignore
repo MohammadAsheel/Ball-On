@@ -101,3 +101,15 @@ backend/db/*.db
 backend/models/*.joblib
 
 
+# Ball-On backend local/generated data
+backend/.env
+
+# Large datasets
+backend/data/raw/*
+backend/db/*.db
+
+# Generated ML model binaries
+backend/models/*.joblib
+
+
+
