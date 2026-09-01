@@ -17,6 +17,7 @@ import {
 import { api } from '@/lib/api';
 import { ApiFootballInjury } from '@/lib/types';
 import { TableSkeleton } from '@/components/ui/Skeleton';
+import { FaviconSearch } from '@/components/ui/FaviconSearch';
 
 interface InjuriesTickerProps {
   initialLeague?: number;
@@ -158,14 +159,14 @@ export function InjuriesTicker({
       {/* Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-white/[0.08] bg-white/[0.02] p-3">
         {/* Search */}
-        <div className="relative w-full sm:w-80">
-          <Search size={14} className="absolute left-3 top-2.5 text-slate-500" />
-          <input
-            type="text"
+        <div className="w-full sm:w-80">
+          <FaviconSearch
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(val) => setSearch(val)}
             placeholder="Search player, club, or condition (e.g. Muscle, Knee)..."
-            className="w-full rounded-lg border border-white/[0.1] bg-black/40 py-1.5 pl-9 pr-3 text-xs text-white placeholder-slate-500 focus:border-rose-500 focus:outline-none"
+            clearable={true}
+            className="w-full"
+            inputClassName="py-1.5 pl-[46px] text-xs rounded-lg border border-white/[0.1] bg-black/40 focus:border-rose-500"
           />
         </div>
 

@@ -6,6 +6,7 @@ import { Search, Sparkles, ArrowRight, User } from 'lucide-react';
 import { api } from '@/lib/api';
 import { PlayerSearchItem } from '@/lib/types';
 import { formatEUR } from '@/lib/format';
+import { FaviconSearch } from '@/components/ui/FaviconSearch';
 
 export function HeroSearch() {
   const router = useRouter();
@@ -79,20 +80,16 @@ export function HeroSearch() {
 
       {/* Search */}
       <div ref={searchRef} className="max-w-xl mx-auto relative text-left">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search a player..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => results.length > 0 && setIsOpen(true)}
-            className="w-full pl-11 pr-4 py-3.5 text-sm bg-[#0c1220] border border-white/[0.08] focus:border-sky-500 rounded-xl text-white placeholder-slate-500 shadow-lg shadow-black/30 focus:outline-none transition-all"
-          />
-          <Search className="absolute left-3.5 top-3.5 text-slate-500" size={18} />
-          {loading && (
-            <div className="absolute right-3.5 top-3.5 w-4 h-4 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
-          )}
-        </div>
+        <FaviconSearch
+          value={query}
+          onChange={(val) => setQuery(val)}
+          onFocus={() => results.length > 0 && setIsOpen(true)}
+          placeholder="Search a player (e.g. Haaland, Bellingham, Mbappé)..."
+          loading={loading}
+          clearable={true}
+          className="max-w-none shadow-2xl shadow-black/40"
+          inputClassName="py-3.5 pl-[52px] text-sm sm:text-base rounded-2xl bg-[#0c1220]/95 border-white/[0.12] focus:border-cyan-400 focus:ring-cyan-500/25"
+        />
 
         {/* Dropdown */}
         {isOpen && results.length > 0 && (

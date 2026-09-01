@@ -28,6 +28,7 @@ import {
   Play,
   Video,
 } from 'lucide-react';
+import { FaviconSearch } from '@/components/ui/FaviconSearch';
 import { api } from '@/lib/api';
 import { InjuriesTicker } from '@/components/live/InjuriesTicker';
 import { NewsFeed } from '@/components/news/NewsFeed';
@@ -395,14 +396,14 @@ export default function LiveDataPage() {
 
         {/* Search Bar */}
         {activeTab !== 'standings' && (
-          <div className="relative w-full lg:w-72">
-            <Search size={14} className="absolute left-3 top-3 text-[#888]" />
-            <input
-              type="text"
+          <div className="w-full lg:w-72">
+            <FaviconSearch
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(val) => setSearchQuery(val)}
               placeholder="Search team or league..."
-              className="w-full border border-[#333] bg-[#111] py-2 pl-9 pr-3 text-xs text-white placeholder-[#666] focus:border-[#00f2fe] focus:outline-none"
+              clearable={true}
+              className="w-full"
+              inputClassName="py-2 pl-[46px] text-xs border border-white/10 bg-[#111] focus:border-[#00f2fe]"
             />
           </div>
         )}

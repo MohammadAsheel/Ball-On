@@ -17,6 +17,7 @@ import {
 import { api } from '@/lib/api';
 import { OverviewData, PlayerSearchItem } from '@/lib/types';
 import { formatEUR } from '@/lib/format';
+import { FaviconSearch } from '@/components/ui/FaviconSearch';
 
 const samplePlayers: PlayerSearchItem[] = [
   { player_id: 1, name: 'Kylian Mbappé', current_club_name: 'Real Madrid', position: 'Attack', sub_position: null, date_of_birth: null, age: 27, country_of_citizenship: 'France', market_value_in_eur: 180000000, image_url: null },
@@ -323,13 +324,14 @@ export default function OverviewPage() {
             ))}
           </div>
 
-          <div className="relative lg:ml-auto lg:w-72">
-            <Search size={14} className="absolute left-3.5 top-3 text-slate-400" />
-            <input
+          <div className="lg:ml-auto lg:w-72">
+            <FaviconSearch
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border border-white/[0.1] bg-[#0c1018] py-2 pl-9 pr-3 text-xs text-white placeholder:text-slate-500"
+              onChange={(val) => setSearch(val)}
               placeholder="Filter catalog…"
+              clearable={true}
+              className="w-full"
+              inputClassName="py-2 pl-[46px] text-xs rounded-xl border-white/[0.1] bg-[#0c1018]"
             />
           </div>
         </div>

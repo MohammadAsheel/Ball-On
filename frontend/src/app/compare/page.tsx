@@ -14,6 +14,7 @@ import {
 import { api } from '@/lib/api';
 import { ComparedPlayer, PlayerSearchItem } from '@/lib/types';
 import { formatEUR, formatNumber } from '@/lib/format';
+import { FaviconSearch } from '@/components/ui/FaviconSearch';
 
 export default function PlayerComparisonPage() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -114,16 +115,14 @@ export default function PlayerComparisonPage() {
       {/* Add Player Search */}
       {selectedIds.length < 4 && (
         <div className="glass-card p-4 border border-white/5 relative max-w-xl">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search player to add to comparison (e.g. Saka, Vinícius Jr., Haaland)..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-sky-500"
-            />
-            <Search className="absolute left-3.5 top-3 text-slate-400" size={16} />
-          </div>
+          <FaviconSearch
+            value={searchQuery}
+            onChange={(val) => setSearchQuery(val)}
+            placeholder="Search player to add to comparison (e.g. Saka, Vinícius Jr., Haaland)..."
+            loading={loading}
+            clearable={true}
+            className="w-full"
+          />
 
           {searchResults.length > 0 && (
             <div className="absolute left-4 right-4 top-full mt-2 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 divide-y divide-white/5">

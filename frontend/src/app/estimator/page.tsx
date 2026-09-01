@@ -13,6 +13,7 @@ import { api } from '@/lib/api';
 import { ValuationPrediction, PlayerSearchItem, ModelMetadata } from '@/lib/types';
 import { formatEUR, formatNumber } from '@/lib/format';
 import { CardSkeleton } from '@/components/ui/Skeleton';
+import { FaviconSearch } from '@/components/ui/FaviconSearch';
 
 function TransferEstimatorContent() {
   const searchParams = useSearchParams();
@@ -186,19 +187,14 @@ function TransferEstimatorContent() {
           {mode === 'player' ? (
             <div className="glass-card p-6 border border-white/5 space-y-4">
               <h3 className="text-sm font-bold text-white uppercase tracking-wider">Search & Load Player</h3>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search player (e.g. Mbappé, Bellingham, Saka)..."
-                  value={playerQuery}
-                  onChange={(e) => setPlayerQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-sky-500"
-                />
-                <Search className="absolute left-3.5 top-3 text-slate-400" size={16} />
-                {searching && (
-                  <div className="absolute right-3.5 top-3 w-4 h-4 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
-                )}
-              </div>
+              <FaviconSearch
+                value={playerQuery}
+                onChange={(val) => setPlayerQuery(val)}
+                placeholder="Search player (e.g. Mbappé, Bellingham, Saka)..."
+                loading={searching}
+                clearable={true}
+                className="w-full"
+              />
 
               {/* Suggestions */}
               {playerResults.length > 0 && (

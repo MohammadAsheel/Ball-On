@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { PlayerSearchItem } from '@/lib/types';
 import { CardSkeleton } from '@/components/ui/Skeleton';
 import PlayerCard from '@/components/ui/PlayerCard';
+import { FaviconSearch } from '@/components/ui/FaviconSearch';
 
 const positions = [
   { label: 'All Positions', value: '' },
@@ -78,30 +79,17 @@ export default function PlayersDirectoryPage() {
       {/* Search & Position Filters */}
       <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
         {/* Search input */}
-        <div className="relative flex-1 max-w-xl">
-          <input
-            type="text"
-            placeholder="Search player by name (e.g. Haaland, Yamal, Vinicius)…"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setPage(1);
-            }}
-            className="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-white/[0.1] bg-[#0e121a]/90 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
-          />
-          <Search className="absolute left-3.5 top-3 text-slate-400" size={16} />
-          {query && (
-            <button
-              onClick={() => {
-                setQuery('');
-                setPage(1);
-              }}
-              className="absolute right-3.5 top-3 text-slate-400 hover:text-white"
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
+        <FaviconSearch
+          value={query}
+          onChange={(val) => {
+            setQuery(val);
+            setPage(1);
+          }}
+          placeholder="Search player by name (e.g. Haaland, Yamal, Vinicius)…"
+          loading={loading}
+          clearable={true}
+          className="flex-1 max-w-xl"
+        />
 
         {/* Filter Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">

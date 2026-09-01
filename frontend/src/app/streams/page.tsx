@@ -22,6 +22,7 @@ import {
   Layers,
   Flame,
 } from 'lucide-react';
+import { FaviconSearch } from '@/components/ui/FaviconSearch';
 
 interface Channel {
   id: string;
@@ -631,14 +632,14 @@ export default function LiveStreamsPage() {
           </div>
 
           {/* Search Bar */}
-          <div className="relative w-full sm:w-72">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
+          <div className="w-full sm:w-80">
+            <FaviconSearch
               placeholder="Search channels, quality, audio..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-[#0e1320] py-2 pl-9 pr-4 text-xs text-slate-200 placeholder-slate-500 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+              onChange={(val) => setSearchQuery(val)}
+              clearable={true}
+              className="w-full"
+              inputClassName="py-2 pl-[46px] text-xs rounded-xl bg-[#0e1320] border-white/10"
             />
           </div>
         </div>
