@@ -4,14 +4,16 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Search, X, Activity, Menu } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { FaviconSearch } from '@/components/ui/FaviconSearch';
+import { UiverseButton } from '@/components/ui/UiverseButton';
 
 const links = [
   { href: '/', label: 'Overview' },
-  { href: '/estimator', label: 'Valuation Engine' },
   { href: '/players', label: 'Players Catalog' },
   { href: '/live', label: 'Live League Feeds' },
   { href: '/streams', label: 'Live Streams', isStream: true },
   { href: '/compare', label: 'Comparison Matrix' },
+  { href: '/estimator', label: 'Valuation Engine' },
 ];
 
 export function Navbar() {
@@ -32,7 +34,8 @@ export function Navbar() {
           hour: '2-digit',
           minute: '2-digit',
           hour12: false,
-        }).format(new Date())
+          timeZone: 'UTC',
+        }).format(new Date()) + ' UTC'
       );
     tick();
     const timer = window.setInterval(tick, 30000);
@@ -128,26 +131,30 @@ export function Navbar() {
 
           {/* Search Bar & Mobile Menu Toggle */}
           <div className="flex items-center gap-2.5">
-            <button
+            <UiverseButton
               onClick={() => setOpen(true)}
-              className="flex items-center gap-3 rounded-xl border border-white/[0.1] bg-white/[0.04] px-3.5 py-2 text-xs text-slate-400 transition hover:border-white/[0.2] hover:bg-white/[0.07] hover:text-white"
+              variant="default"
+              size="sm"
               aria-label="Open command palette"
             >
               <Search size={14} className="text-cyan-400" />
               <span className="hidden sm:inline">Search intelligence…</span>
-              <kbd className="mono-font rounded border border-white/15 bg-black/40 px-1.5 py-0.5 text-[9px] text-slate-300">
+              <kbd className="mono-font rounded border border-white/15 bg-black/40 px-1.5 py-0.5 text-[9px] text-slate-300 ml-1">
                 ⌘ K
               </kbd>
-            </button>
+            </UiverseButton>
 
             {/* Mobile Hamburger */}
-            <button
-              onClick={() => setMobileMenu(!mobileMenu)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.1] bg-white/[0.04] text-slate-400 transition hover:text-white xl:hidden"
-              aria-label="Toggle menu"
-            >
-              {mobileMenu ? <X size={18} /> : <Menu size={18} />}
-            </button>
+            <div className="xl:hidden">
+              <UiverseButton
+                onClick={() => setMobileMenu(!mobileMenu)}
+                variant="default"
+                size="sm"
+                aria-label="Toggle menu"
+              >
+                {mobileMenu ? <X size={18} /> : <Menu size={18} />}
+              </UiverseButton>
+            </div>
           </div>
         </div>
 
@@ -188,26 +195,24 @@ export function Navbar() {
             className="w-full max-w-xl overflow-hidden rounded-2xl border border-white/20 bg-[#0e121a]/95 shadow-[0_25px_70px_rgba(0,0,0,0.8)] backdrop-blur-2xl"
             onMouseDown={(e) => e.stopPropagation()}
           >
-            <form
-              onSubmit={submit}
-              className="flex items-center gap-3 border-b border-white/[0.08] px-5 py-4"
-            >
-              <Search size={18} className="text-cyan-400 shrink-0" />
-              <input
-                autoFocus
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="w-full border-0 bg-transparent p-0 text-sm font-medium text-white placeholder:text-slate-500 focus:shadow-none focus:outline-none"
-                placeholder="Search players, clubs, or valuations (e.g. Haaland, Real Madrid)…"
-              />
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="rounded-lg p-1 text-slate-400 hover:bg-white/10 hover:text-white"
-              >
-                <X size={18} />
-              </button>
-            </form>
+            <div className="border-b border-white/[0.08] p-3">
+              <form onSubmit={submit}>
+                <FaviconSearch
+                  autoFocus
+                  value={query}
+                  onChange={(val) => setQuery(val)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      submit(e);
+                    }
+                  }}
+                  placeholder="Search players, clubs, or valuations (e.g. Haaland, Real Madrid)…"
+                  clearable={true}
+                  className="w-full"
+                  inputClassName="py-3 pl-[48px] text-sm rounded-xl bg-black/40 border-white/10 focus:border-cyan-400"
+                />
+              </form>
+            </div>
 
             <div className="p-3">
               <p className="editorial-kicker px-3 py-2 text-slate-400 font-semibold">

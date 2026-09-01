@@ -17,6 +17,8 @@ import {
 import { api } from '@/lib/api';
 import { OverviewData, PlayerSearchItem } from '@/lib/types';
 import { formatEUR } from '@/lib/format';
+import { FaviconSearch } from '@/components/ui/FaviconSearch';
+import { UiverseButton } from '@/components/ui/UiverseButton';
 
 const samplePlayers: PlayerSearchItem[] = [
   { player_id: 1, name: 'Kylian Mbappé', current_club_name: 'Real Madrid', position: 'Attack', sub_position: null, date_of_birth: null, age: 27, country_of_citizenship: 'France', market_value_in_eur: 180000000, image_url: null },
@@ -263,12 +265,16 @@ export default function OverviewPage() {
                 €{value - 9}M — €{value + 12}M
               </span>
             </div>
-            <Link
+            <UiverseButton
               href="/estimator"
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 text-xs font-bold text-[#080808] transition hover:bg-cyan-300 hover:shadow-[0_0_20px_rgba(0,242,254,0.3)]"
+              variant="cyan"
+              size="lg"
+              className="w-full"
+              containerClassName="w-full"
             >
-              Open Full Valuation Engine <ArrowUpRight size={14} />
-            </Link>
+              <span>Open Full Valuation Engine</span>
+              <ArrowUpRight size={14} />
+            </UiverseButton>
           </div>
         </div>
       </section>
@@ -281,27 +287,23 @@ export default function OverviewPage() {
             <span className="editorial-kicker text-cyan-400">Global Entity Index</span>
             <h2 className="display-font mt-1 text-2xl font-bold text-white">Market Leaders</h2>
           </div>
-          <div className="flex items-center gap-2">
-            <button
+          <div className="flex items-center gap-1.5">
+            <UiverseButton
+              size="xs"
+              active={view === 'grid'}
               onClick={() => setView('grid')}
-              className={`flex h-9 w-9 items-center justify-center rounded-xl border transition ${
-                view === 'grid'
-                  ? 'border-cyan-400 bg-cyan-500/15 text-cyan-300'
-                  : 'border-white/[0.1] text-slate-400 hover:text-white'
-              }`}
+              aria-label="Grid view"
             >
-              <Grid2X2 size={16} />
-            </button>
-            <button
+              <Grid2X2 size={14} />
+            </UiverseButton>
+            <UiverseButton
+              size="xs"
+              active={view === 'table'}
               onClick={() => setView('table')}
-              className={`flex h-9 w-9 items-center justify-center rounded-xl border transition ${
-                view === 'table'
-                  ? 'border-cyan-400 bg-cyan-500/15 text-cyan-300'
-                  : 'border-white/[0.1] text-slate-400 hover:text-white'
-              }`}
+              aria-label="Table view"
             >
-              <List size={16} />
-            </button>
+              <List size={14} />
+            </UiverseButton>
           </div>
         </div>
 
@@ -309,27 +311,25 @@ export default function OverviewPage() {
         <div className="flex flex-col gap-3 border-b border-white/[0.08] p-4 lg:flex-row lg:items-center">
           <div className="flex gap-1.5 overflow-x-auto pb-1 lg:pb-0">
             {['All Players', 'Active Stars', 'Historical Legends'].map((item) => (
-              <button
+              <UiverseButton
                 key={item}
+                size="sm"
+                active={era === item}
                 onClick={() => setEra(item)}
-                className={`whitespace-nowrap rounded-xl px-3.5 py-2 text-xs font-semibold transition ${
-                  era === item
-                    ? 'bg-white/10 text-white border border-white/20'
-                    : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
-                }`}
               >
                 {item}
-              </button>
+              </UiverseButton>
             ))}
           </div>
 
-          <div className="relative lg:ml-auto lg:w-72">
-            <Search size={14} className="absolute left-3.5 top-3 text-slate-400" />
-            <input
+          <div className="lg:ml-auto lg:w-72">
+            <FaviconSearch
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border border-white/[0.1] bg-[#0c1018] py-2 pl-9 pr-3 text-xs text-white placeholder:text-slate-500"
+              onChange={(val) => setSearch(val)}
               placeholder="Filter catalog…"
+              clearable={true}
+              className="w-full"
+              inputClassName="py-2 pl-[46px] text-xs rounded-xl border-white/[0.1] bg-[#0c1018]"
             />
           </div>
         </div>
@@ -434,12 +434,14 @@ export default function OverviewPage() {
             DISPLAYING 1—{Math.min(4, filtered.length)} /{' '}
             {overview?.kpis?.total_players?.toLocaleString() || '50,000+'}
           </span>
-          <Link
+          <UiverseButton
             href="/players"
-            className="flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:underline"
+            variant="cyan"
+            size="sm"
           >
-            View all players →
-          </Link>
+            <span>View all players</span>
+            <ArrowUpRight size={13} />
+          </UiverseButton>
         </div>
       </section>
 
@@ -473,9 +475,10 @@ export default function OverviewPage() {
                 <span className="editorial-kicker text-cyan-400">Comparison Matrix</span>
                 <h2 className="display-font mt-2 text-2xl font-bold text-white">Edge Vector Analysis</h2>
               </div>
-              <Link href="/compare" className="text-xs font-semibold text-cyan-400 hover:underline">
-                Open Matrix →
-              </Link>
+              <UiverseButton href="/compare" variant="default" size="xs">
+                <span>Open Matrix</span>
+                <ArrowUpRight size={12} />
+              </UiverseButton>
             </div>
 
             <div className="mt-6 space-y-4">

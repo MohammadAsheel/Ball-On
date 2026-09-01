@@ -15,6 +15,8 @@ import { api } from '@/lib/api';
 import { TransfersResponse } from '@/lib/types';
 import { formatEUR, formatDate } from '@/lib/format';
 import { TableSkeleton } from '@/components/ui/Skeleton';
+import { FaviconSearch } from '@/components/ui/FaviconSearch';
+import { UiverseButton } from '@/components/ui/UiverseButton';
 
 export default function TransfersPage() {
   const [data, setData] = useState<TransfersResponse | null>(null);
@@ -76,19 +78,17 @@ export default function TransfersPage() {
           {/* Club search */}
           <div>
             <label className="text-slate-400 font-semibold block mb-1">Club Filter</label>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search club (e.g. Real Madrid, Arsenal)..."
-                value={clubSearch}
-                onChange={(e) => {
-                  setClubSearch(e.target.value);
-                  setPage(1);
-                }}
-                className="w-full pl-8 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white"
-              />
-              <Search className="absolute left-2.5 top-2.5 text-slate-400" size={14} />
-            </div>
+            <FaviconSearch
+              placeholder="Search club (e.g. Real Madrid, Arsenal)..."
+              value={clubSearch}
+              onChange={(val) => {
+                setClubSearch(val);
+                setPage(1);
+              }}
+              clearable={true}
+              className="w-full"
+              inputClassName="py-2 pl-[46px] text-xs rounded-lg bg-slate-950 border-slate-700"
+            />
           </div>
 
           {/* Position */}
@@ -212,20 +212,24 @@ export default function TransfersPage() {
               </span>
 
               <div className="flex items-center gap-2">
-                <button
+                <UiverseButton
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1 || loading}
-                  className="btn-secondary py-1.5 px-3 disabled:opacity-40 flex items-center gap-1"
+                  size="sm"
+                  variant="default"
                 >
-                  <ChevronLeft size={14} /> Previous
-                </button>
-                <button
+                  <ChevronLeft size={13} />
+                  <span>Previous</span>
+                </UiverseButton>
+                <UiverseButton
                   onClick={() => setPage((p) => Math.min(data.total_pages, p + 1))}
                   disabled={page >= data.total_pages || loading}
-                  className="btn-secondary py-1.5 px-3 disabled:opacity-40 flex items-center gap-1"
+                  size="sm"
+                  variant="default"
                 >
-                  Next <ChevronRight size={14} />
-                </button>
+                  <span>Next</span>
+                  <ChevronRight size={13} />
+                </UiverseButton>
               </div>
             </div>
           </>

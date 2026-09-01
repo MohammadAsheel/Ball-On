@@ -18,6 +18,7 @@ import {
 import { api } from '@/lib/api';
 import { FootballNewsArticle } from '@/lib/types';
 import { TableSkeleton } from '@/components/ui/Skeleton';
+import { FaviconSearch } from '@/components/ui/FaviconSearch';
 
 interface NewsFeedProps {
   initialCategory?: string;
@@ -179,14 +180,14 @@ export function NewsFeed({
           </div>
 
           {/* Search */}
-          <div className="relative w-full sm:w-64">
-            <Search size={14} className="absolute left-3 top-2.5 text-slate-500" />
-            <input
-              type="text"
+          <div className="w-full sm:w-64">
+            <FaviconSearch
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(val) => setSearch(val)}
               placeholder="Search news or players..."
-              className="w-full rounded-lg border border-white/[0.1] bg-black/40 py-1.5 pl-9 pr-3 text-xs text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none"
+              clearable={true}
+              className="w-full"
+              inputClassName="py-1.5 pl-[46px] text-xs rounded-lg border border-white/[0.1] bg-black/40"
             />
           </div>
         </div>

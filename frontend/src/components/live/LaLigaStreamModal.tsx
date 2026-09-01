@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Tv, X, Maximize2, Radio, ExternalLink, ShieldCheck, Sparkles, Volume2 } from 'lucide-react';
+import { UiverseButton } from '@/components/ui/UiverseButton';
 
 export const LALIGA_STREAM_URL =
   'https://ntv.cx/embed?t=Z0hobzNYTEYyVE4xRHNDRDNBSlFzbEdRM29PSXN3Vkw0UXROczFlMkh5OFZ0bzQrcGVPbVhGaEIrMjZDM0VMR1REMkFOU3FMYzJrbTBPMU5CZzZNY3RuZG8vRWNObERDSFZoR1pYbTdHZkc3Y1d3TE1mNWdWZVlJRk02ZHVHY29ZcEdOeWphdmtrMXpFdld0WGhFZy93PT0~';
@@ -61,22 +62,25 @@ export function LaLigaStreamModal({
 
           <div className="flex items-center gap-2">
             {/* Toggle Cinema Size */}
-            <button
+            <UiverseButton
               onClick={() => setCinemaMode(!cinemaMode)}
-              className="flex h-8 items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 text-xs text-slate-300 hover:border-white/20 hover:bg-white/10 hover:text-white transition"
+              size="xs"
+              variant="default"
               title="Toggle Cinema Mode"
             >
               <Maximize2 size={13} />
               <span className="hidden sm:inline">{cinemaMode ? 'Compact' : 'Cinema'}</span>
-            </button>
+            </UiverseButton>
 
             {/* Close Button */}
-            <button
+            <UiverseButton
               onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-400 hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-400 transition"
+              size="xs"
+              variant="rose"
+              aria-label="Close stream"
             >
-              <X size={16} />
-            </button>
+              <X size={14} />
+            </UiverseButton>
           </div>
         </div>
 

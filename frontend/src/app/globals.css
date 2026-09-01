@@ -257,59 +257,6 @@ td {
   background: rgba(255, 255, 255, 0.035);
 }
 
-/* ─── Uiverse.io Neumorphic Glow Buttons (by TimTrayler) ─── */
-button:not([aria-label*="Close"]):not(.cyber-tracker),
-.btn-primary,
-.btn-secondary,
-.btn-uiverse {
-  --hover-shadows: 16px 16px 33px #121212, -16px -16px 33px #303030;
-  --accent: fuchsia;
-  font-weight: bold;
-  letter-spacing: 0.1em;
-  border: none;
-  border-radius: 1.1em;
-  background-color: #212121;
-  cursor: pointer;
-  color: white;
-  padding: 0.75em 1.75em;
-  transition: box-shadow ease-in-out 0.3s, background-color ease-in-out 0.1s,
-    letter-spacing ease-in-out 0.1s, transform ease-in-out 0.1s;
-  box-shadow: 13px 13px 10px #1c1c1c, -13px -13px 10px #262626;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-button:not([aria-label*="Close"]):not(.cyber-tracker):hover,
-.btn-primary:hover,
-.btn-secondary:hover,
-.btn-uiverse:hover {
-  box-shadow: var(--hover-shadows);
-  letter-spacing: 0.12em;
-}
-
-button:not([aria-label*="Close"]):not(.cyber-tracker):active,
-.btn-primary:active,
-.btn-secondary:active,
-.btn-uiverse:active {
-  box-shadow: var(--hover-shadows), var(--accent) 0px 0px 30px 5px !important;
-  background-color: var(--accent) !important;
-  transform: scale(0.95) !important;
-  color: #ffffff !important;
-}
-
-.btn-primary {
-  --accent: #00f2fe;
-}
-
-.btn-secondary {
-  --accent: #10b981;
-}
-
-.btn-accent {
-  --accent: fuchsia;
-}
 
 /* ─── Shimmer Animation ──────────────────────────────────── */
 @keyframes shimmer {
