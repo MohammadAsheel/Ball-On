@@ -14,6 +14,7 @@ import { ValuationPrediction, PlayerSearchItem, ModelMetadata } from '@/lib/type
 import { formatEUR, formatNumber } from '@/lib/format';
 import { CardSkeleton } from '@/components/ui/Skeleton';
 import { FaviconSearch } from '@/components/ui/FaviconSearch';
+import { UiverseButton } from '@/components/ui/UiverseButton';
 
 function TransferEstimatorContent() {
   const searchParams = useSearchParams();
@@ -38,36 +39,26 @@ function TransferEstimatorContent() {
   const [assists, setAssists] = useState<number>(8);
   const [useMarketValue, setUseMarketValue] = useState<boolean>(true);
 
-  // Result & Benchmark State
+  // Output State
   const [result, setResult] = useState<ValuationPrediction | null>(null);
   const [modelMeta, setModelMeta] = useState<ModelMetadata | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Load Model Metadata
   useEffect(() => {
-    async function loadMeta() {
-      try {
-        const meta = await api.getModelMetadata();
-        setModelMeta(meta);
-      } catch (err) {
-        console.error('Failed to load model benchmarks:', err);
-      }
-    }
-    loadMeta();
+    api.getModelMetadata()
+      .then(setModelMeta)
+      .catch((err) => console.error('Failed to load metadata:', err));
   }, []);
 
-  // Handle Initial Player ID if passed via URL
   useEffect(() => {
     if (initialPlayerId) {
-      loadPlayerEstimator(initialPlayerId);
-    } else {
-      runScenarioPrediction();
+      loadPlayerEstimator(Number(initialPlayerId));
     }
   }, [initialPlayerId]);
 
-  // Search debounce for Player Mode
+  // Debounced search for players
   useEffect(() => {
-    if (playerQuery.trim().length < 2) {
+    if (!playerQuery || playerQuery.length < 2) {
       setPlayerResults([]);
       return;
     }
@@ -75,17 +66,17 @@ function TransferEstimatorContent() {
       setSearching(true);
       try {
         const res = await api.searchPlayers(playerQuery, 5);
-        setPlayerResults(res.players);
+        setPlayerResults(res.players || []);
       } catch (err) {
-        console.error('Player search error:', err);
+        console.error('Search failed:', err);
       } finally {
         setSearching(false);
       }
-    }, 200);
+    }, 300);
     return () => clearTimeout(timer);
   }, [playerQuery]);
 
-  const loadPlayerEstimator = async (playerId: number | string) => {
+  const loadPlayerEstimator = async (playerId: number) => {
     setLoading(true);
     try {
       const data = await api.estimatePlayer(playerId);
@@ -157,27 +148,21 @@ function TransferEstimatorContent() {
       </div>
 
       {/* Mode Switcher */}
-      <div className="flex items-center gap-2 p-1 bg-slate-900 border border-white/5 rounded-xl w-fit">
-        <button
+      <div className="flex items-center gap-2">
+        <UiverseButton
           onClick={() => setMode('player')}
-          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-            mode === 'player'
-              ? 'bg-sky-500 text-white shadow-md shadow-sky-500/25'
-              : 'text-slate-400 hover:text-white'
-          }`}
+          active={mode === 'player'}
+          size="md"
         >
           👤 Player Mode (Load Real Stats)
-        </button>
-        <button
+        </UiverseButton>
+        <UiverseButton
           onClick={() => setMode('scenario')}
-          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-            mode === 'scenario'
-              ? 'bg-sky-500 text-white shadow-md shadow-sky-500/25'
-              : 'text-slate-400 hover:text-white'
-          }`}
+          active={mode === 'scenario'}
+          size="md"
         >
           ⚙️ Scenario Mode (What-If Simulation)
-        </button>
+        </UiverseButton>
       </div>
 
       {/* Main Grid: Inputs vs Prediction Output */}
@@ -346,13 +331,16 @@ function TransferEstimatorContent() {
                   />
                 </div>
 
-                <button
+                <UiverseButton
                   onClick={runScenarioPrediction}
                   disabled={loading}
-                  className="btn-primary w-full py-2.5 text-xs font-bold mt-2"
+                  variant="cyan"
+                  size="md"
+                  className="w-full mt-2"
+                  containerClassName="w-full"
                 >
                   {loading ? 'Evaluating...' : 'Run Valuation'}
-                </button>
+                </UiverseButton>
               </div>
             </div>
           )}

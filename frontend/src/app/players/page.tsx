@@ -7,6 +7,7 @@ import { PlayerSearchItem } from '@/lib/types';
 import { CardSkeleton } from '@/components/ui/Skeleton';
 import PlayerCard from '@/components/ui/PlayerCard';
 import { FaviconSearch } from '@/components/ui/FaviconSearch';
+import { UiverseButton } from '@/components/ui/UiverseButton';
 
 const positions = [
   { label: 'All Positions', value: '' },
@@ -47,13 +48,12 @@ export default function PlayersDirectoryPage() {
         setLoading(false);
       }
     }
-    const timer = setTimeout(loadDirectory, 200);
-    return () => clearTimeout(timer);
-  }, [query, position, page]);
+    loadDirectory();
+  }, [position, page, query]);
 
   return (
-    <div className="space-y-7 pb-10">
-      {/* Header Banner */}
+    <div className="space-y-8 pb-12">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-white/[0.08] pb-6">
         <div>
           <div className="flex items-center gap-2 mb-2">
@@ -96,20 +96,17 @@ export default function PlayersDirectoryPage() {
           {positions.map((p) => {
             const active = position === p.value;
             return (
-              <button
+              <UiverseButton
                 key={p.value}
+                size="sm"
+                active={active}
                 onClick={() => {
                   setPosition(p.value);
                   setPage(1);
                 }}
-                className={`whitespace-nowrap rounded-xl px-3.5 py-2 text-xs font-semibold tracking-wide transition-all ${
-                  active
-                    ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/40 shadow-[0_0_15px_rgba(0,242,254,0.15)]'
-                    : 'bg-white/[0.03] text-slate-400 border border-white/[0.06] hover:border-white/[0.15] hover:text-white'
-                }`}
               >
                 {p.label}
-              </button>
+              </UiverseButton>
             );
           })}
         </div>
@@ -146,23 +143,27 @@ export default function PlayersDirectoryPage() {
               </span>
 
               <div className="flex items-center gap-2">
-                <button
+                <UiverseButton
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="btn-secondary py-2 px-3.5 text-xs rounded-xl disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5"
+                  size="sm"
+                  variant="default"
                 >
-                  <ChevronLeft size={14} /> Previous
-                </button>
+                  <ChevronLeft size={13} />
+                  <span>Previous</span>
+                </UiverseButton>
                 <span className="mono-font rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-slate-300 font-semibold">
                   {page} / {Math.ceil(totalCount / 24)}
                 </span>
-                <button
+                <UiverseButton
                   onClick={() => setPage((p) => p + 1)}
                   disabled={page * 24 >= totalCount}
-                  className="btn-secondary py-2 px-3.5 text-xs rounded-xl disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5"
+                  size="sm"
+                  variant="default"
                 >
-                  Next <ChevronRight size={14} />
-                </button>
+                  <span>Next</span>
+                  <ChevronRight size={13} />
+                </UiverseButton>
               </div>
             </div>
           )}

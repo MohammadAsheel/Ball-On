@@ -29,6 +29,7 @@ import {
   Video,
 } from 'lucide-react';
 import { FaviconSearch } from '@/components/ui/FaviconSearch';
+import { UiverseButton } from '@/components/ui/UiverseButton';
 import { api } from '@/lib/api';
 import { InjuriesTicker } from '@/components/live/InjuriesTicker';
 import { NewsFeed } from '@/components/news/NewsFeed';
@@ -65,10 +66,10 @@ const BBS_LEAGUES = [
   { code: 'ucl', name: 'Champions League', flag: '🇪🇺' },
 ];
 
-type MainTab = 'bigballs' | 'news' | 'injuries' | 'livescores' | 'fixtures' | 'finished' | 'standings';
+type MainTab = 'matchon' | 'news' | 'injuries' | 'livescores' | 'finished' | 'standings';
 
 export default function LiveDataPage() {
-  const [activeTab, setActiveTab] = useState<MainTab>('bigballs');
+  const [activeTab, setActiveTab] = useState<MainTab>('matchon');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -243,12 +244,14 @@ export default function LiveDataPage() {
   const filteredFinished = useMemo(() => filterMatches(finishedMatches), [finishedMatches, searchQuery]);
 
   const handleGlobalRefresh = () => {
-    if (activeTab === 'bigballs') {
-      loadBbsMatches(true);
-    } else {
-      loadSportMonksData(true);
+    loadBbsMatches(true);
+    loadSportMonksData(true);
+    if (activeTab === 'standings') {
+      loadStandingsData(selectedFdLeague);
     }
   };
+
+  const totalMatchOnFixtures = filteredBbsMatches.length + filteredFixtures.length;
 
   return (
     <div className="space-y-6 pb-12">
@@ -257,29 +260,30 @@ export default function LiveDataPage() {
         <div>
           <div className="flex items-center gap-2 flex-wrap">
             <span className="mono-font border border-[#10b981]/40 bg-[#10b981]/10 px-2 py-0.5 text-[10px] tracking-wider text-[#10b981]">
-              BIGBALLSDATA SDK + SPORTMONKS v3
+              MATCHON MULTI-FEED ENGINE
             </span>
             <span className="inline-flex items-center gap-1 text-[11px] text-[#10b981] font-mono">
-              <span className="h-2 w-2 rounded-full bg-[#10b981] animate-pulse" /> MULTI-FEED ENGINE CONNECTED
+              <span className="h-2 w-2 rounded-full bg-[#10b981] animate-pulse" /> BIGBALLSDATA SDK + SPORTMONKS v3
             </span>
           </div>
           <h1 className="display-font text-3xl sm:text-4xl text-[#f0f0f0] mt-2">
-            Live Matches & Fixtures Intelligence
+            Live Matches & MatchOn Fixtures
           </h1>
           <p className="text-xs text-[#888] mt-1">
-            Real-time live scores, multi-league fixtures via BigBallSports SDK, API-Football squad injury wire, match statistics, and standings.
+            Real-time live scores, MatchOn Fixtures (merging BigBallSports SDK & SportMonks v3), API-Football squad injury wire, match statistics, and standings.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <button
+          <UiverseButton
             onClick={handleGlobalRefresh}
             disabled={refreshing}
-            className="flex items-center gap-2 border border-[#333] bg-[#141414] px-3.5 py-2 text-xs text-[#ddd] hover:border-[#555] hover:text-white transition disabled:opacity-50"
+            size="sm"
+            variant="default"
           >
             <RefreshCw size={13} className={refreshing ? 'animate-spin text-[#00f2fe]' : ''} />
             <span>{refreshing ? 'Syncing...' : 'Sync Live Feeds'}</span>
-          </button>
+          </UiverseButton>
         </div>
       </div>
 
@@ -287,56 +291,44 @@ export default function LiveDataPage() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         {/* Navigation Tabs */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1">
-          {/* BigBallsData Tab */}
-          <button
-            onClick={() => setActiveTab('bigballs')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold tracking-wide border transition ${
-              activeTab === 'bigballs'
-                ? 'border-[#00f2fe] bg-[#00f2fe]/15 text-[#00f2fe]'
-                : 'border-[#333] bg-[#111] text-[#888] hover:text-white'
-            }`}
+          {/* MatchOn Fixtures Tab (Merged BigBallSports + SportMonks) */}
+          <UiverseButton
+            onClick={() => setActiveTab('matchon')}
+            active={activeTab === 'matchon'}
+            size="sm"
           >
             <Zap size={14} className="text-[#00f2fe]" />
-            <span>BigBallSports Fixtures</span>
+            <span>MatchOn Fixtures</span>
             <span className="mono-font ml-1 rounded bg-[#222] px-1.5 py-0.2 text-[10px] text-white">
-              {bbsMatches.length}
+              {totalMatchOnFixtures}
             </span>
-          </button>
+          </UiverseButton>
 
           {/* Breaking Football News Stream (RSS Aggregator) */}
-          <button
+          <UiverseButton
             onClick={() => setActiveTab('news')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold tracking-wide border transition ${
-              activeTab === 'news'
-                ? 'border-cyan-400 bg-cyan-400/15 text-cyan-300'
-                : 'border-[#333] bg-[#111] text-[#888] hover:text-white'
-            }`}
+            active={activeTab === 'news'}
+            size="sm"
           >
             <Newspaper size={14} className="text-cyan-400" />
             <span>News & Transfer Wire</span>
-          </button>
+          </UiverseButton>
 
           {/* Squad Availability & Injuries Wire (API-Football) */}
-          <button
+          <UiverseButton
             onClick={() => setActiveTab('injuries')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold tracking-wide border transition ${
-              activeTab === 'injuries'
-                ? 'border-rose-500 bg-rose-500/15 text-rose-300'
-                : 'border-[#333] bg-[#111] text-[#888] hover:text-white'
-            }`}
+            active={activeTab === 'injuries'}
+            size="sm"
           >
             <Stethoscope size={14} className="text-rose-400" />
             <span>Injury & Medical Wire</span>
-          </button>
+          </UiverseButton>
 
           {/* SportMonks Live Scores */}
-          <button
+          <UiverseButton
             onClick={() => setActiveTab('livescores')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold tracking-wide border transition ${
-              activeTab === 'livescores'
-                ? 'border-[#ff3366] bg-[#ff3366]/15 text-[#ff3366]'
-                : 'border-[#333] bg-[#111] text-[#888] hover:text-white'
-            }`}
+            active={activeTab === 'livescores'}
+            size="sm"
           >
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff3366] opacity-75"></span>
@@ -346,52 +338,30 @@ export default function LiveDataPage() {
             <span className="mono-font ml-1 rounded bg-[#222] px-1.5 py-0.2 text-[10px] text-white">
               {liveScores.length}
             </span>
-          </button>
+          </UiverseButton>
 
-          {/* SportMonks Upcoming Fixtures */}
-          <button
-            onClick={() => setActiveTab('fixtures')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold tracking-wide border transition ${
-              activeTab === 'fixtures'
-                ? 'border-[#00f2fe] bg-[#00f2fe]/15 text-[#00f2fe]'
-                : 'border-[#333] bg-[#111] text-[#888] hover:text-white'
-            }`}
-          >
-            <Calendar size={14} />
-            <span>SportMonks Fixtures</span>
-            <span className="mono-font ml-1 rounded bg-[#222] px-1.5 py-0.2 text-[10px] text-white">
-              {upcomingFixtures.length}
-            </span>
-          </button>
-
-          {/* SportMonks Finished */}
-          <button
+          {/* Finished Results */}
+          <UiverseButton
             onClick={() => setActiveTab('finished')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold tracking-wide border transition ${
-              activeTab === 'finished'
-                ? 'border-[#10b981] bg-[#10b981]/15 text-[#10b981]'
-                : 'border-[#333] bg-[#111] text-[#888] hover:text-white'
-            }`}
+            active={activeTab === 'finished'}
+            size="sm"
           >
-            <CheckCircle2 size={14} />
+            <CheckCircle2 size={14} className="text-[#10b981]" />
             <span>Finished Results</span>
             <span className="mono-font ml-1 rounded bg-[#222] px-1.5 py-0.2 text-[10px] text-white">
               {finishedMatches.length}
             </span>
-          </button>
+          </UiverseButton>
 
           {/* League Standings */}
-          <button
+          <UiverseButton
             onClick={() => setActiveTab('standings')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold tracking-wide border transition ${
-              activeTab === 'standings'
-                ? 'border-[#f59e0b] bg-[#f59e0b]/15 text-[#f59e0b]'
-                : 'border-[#333] bg-[#111] text-[#888] hover:text-white'
-            }`}
+            active={activeTab === 'standings'}
+            size="sm"
           >
-            <Trophy size={14} />
+            <Trophy size={14} className="text-[#f59e0b]" />
             <span>Standings & Scorers</span>
-          </button>
+          </UiverseButton>
         </div>
 
         {/* Search Bar */}
@@ -410,70 +380,85 @@ export default function LiveDataPage() {
       </div>
 
       {/* Main Content Area */}
-      {loading && activeTab !== 'bigballs' ? (
+      {loading && activeTab !== 'matchon' ? (
         <div className="space-y-4">
           <TableSkeleton rows={8} />
         </div>
-      ) : error && activeTab !== 'bigballs' ? (
+      ) : error && activeTab !== 'matchon' ? (
         <div className="terminal-card p-12 text-center text-rose-400 border border-rose-900/40">
           <p className="font-semibold">Live Feeds Connection Error</p>
           <p className="text-xs text-[#888] mt-1">{error}</p>
         </div>
       ) : (
         <>
-          {/* TAB 0: BIGBALLSDATA SDK FIXTURES HUB */}
-          {activeTab === 'bigballs' && (
+          {/* TAB: MATCHON FIXTURES (MERGED BIGBALLSPORTS + SPORTMONKS) */}
+          {activeTab === 'matchon' && (
             <div className="space-y-6">
-              {/* League & Status Filter Bar */}
+              {/* Controls: League Selector, Match Status & Schedule Window */}
               <div className="terminal-card p-4 space-y-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
                   {/* League Switcher */}
                   <div className="space-y-1.5">
-                    <p className="text-[11px] font-mono text-[#888] uppercase tracking-wider">
-                      Select League (BigBallSports SDK)
+                    <p className="text-[10px] font-mono text-[#888] uppercase tracking-wider">
+                      Competition / League
                     </p>
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {BBS_LEAGUES.map((l) => (
-                        <button
+                        <UiverseButton
                           key={l.code}
+                          size="xs"
+                          active={bbsLeague === l.code}
                           onClick={() => setBbsLeague(l.code)}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 border text-xs font-medium transition ${
-                            bbsLeague === l.code
-                              ? 'border-[#00f2fe] bg-[#00f2fe]/15 text-[#00f2fe]'
-                              : 'border-[#333] text-[#888] hover:text-white hover:border-[#555]'
-                          }`}
                         >
                           <span>{l.flag}</span>
                           <span>{l.name}</span>
-                        </button>
+                        </UiverseButton>
                       ))}
                     </div>
                   </div>
 
-                  {/* Status Switcher */}
-                  <div className="space-y-1.5">
-                    <p className="text-[11px] font-mono text-[#888] uppercase tracking-wider">
-                      Match Status
-                    </p>
-                    <div className="flex items-center gap-1.5">
-                      {[
-                        { id: 'all', label: 'All' },
-                        { id: 'scheduled', label: 'Upcoming' },
-                        { id: 'live', label: 'Live' },
-                        { id: 'finished', label: 'Finished' },
-                      ].map((st) => (
-                        <button
-                          key={st.id}
-                          onClick={() => setBbsStatus(st.id)}
-                          className={`px-3 py-1.5 border text-xs font-medium transition ${
-                            bbsStatus === st.id
-                              ? 'border-[#10b981] bg-[#10b981]/15 text-[#10b981]'
-                              : 'border-[#333] text-[#888] hover:text-white'
-                          }`}
-                        >
-                          {st.label}
-                        </button>
-                      ))}
+                  <div className="flex flex-wrap items-center gap-4">
+                    {/* Status Switcher */}
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] font-mono text-[#888] uppercase tracking-wider">
+                        Match Status
+                      </p>
+                      <div className="flex items-center gap-1.5">
+                        {[
+                          { id: 'all', label: 'All' },
+                          { id: 'scheduled', label: 'Upcoming' },
+                          { id: 'live', label: 'Live' },
+                          { id: 'finished', label: 'Finished' },
+                        ].map((st) => (
+                          <UiverseButton
+                            key={st.id}
+                            size="xs"
+                            active={bbsStatus === st.id}
+                            onClick={() => setBbsStatus(st.id)}
+                          >
+                            {st.label}
+                          </UiverseButton>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Window Range Filter (for SportMonks & future schedule) */}
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] font-mono text-[#888] uppercase tracking-wider">
+                        Schedule Window
+                      </p>
+                      <div className="flex items-center gap-1.5">
+                        {[3, 7, 14, 21, 30].map((d) => (
+                          <UiverseButton
+                            key={d}
+                            size="xs"
+                            active={fixtureDays === d}
+                            onClick={() => setFixtureDays(d)}
+                          >
+                            {d}D
+                          </UiverseButton>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -498,49 +483,85 @@ export default function LiveDataPage() {
                     </h4>
                   </div>
                 </div>
-                <Link
+                <UiverseButton
                   href="/streams"
-                  className="flex items-center justify-center gap-2 rounded-xl border border-rose-500/60 bg-rose-500 px-4 py-2 text-xs font-bold text-white shadow-[0_0_20px_rgba(244,63,94,0.4)] hover:bg-rose-600 transition hover:scale-105 active:scale-95 shrink-0"
+                  variant="rose"
+                  size="sm"
                 >
                   <Play size={13} fill="currentColor" />
                   <span>Open Live TV Streams</span>
-                </Link>
+                </UiverseButton>
               </div>
 
-              {/* Match Cards Grid */}
-              {bbsLoading ? (
+              {/* MatchOn Merged Cards Grid */}
+              {bbsLoading && loading ? (
                 <div className="space-y-4">
                   <TableSkeleton rows={6} />
                 </div>
-              ) : filteredBbsMatches.length === 0 ? (
-                <div className="terminal-card p-12 text-center space-y-3">
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-[#333] bg-[#1a1a1a] text-[#888]">
-                    <Calendar size={20} />
-                  </div>
-                  <h3 className="display-font text-lg text-[#ddd]">No Matches Found</h3>
-                  <p className="text-xs text-[#888] max-w-md mx-auto">
-                    No matches found for the selected league ({bbsLeague.toUpperCase()}) and status ({bbsStatus}). Try switching leagues or filters.
-                  </p>
-                </div>
               ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <p className="editorial-kicker text-[#00f2fe]">
-                      BigBallSports Fixtures & Scores ({filteredBbsMatches.length} Matches)
-                    </p>
-                    <span className="mono-font text-[10px] text-[#666]">
-                      PROVIDER: @bigballsdata/sdk
-                    </span>
+                <div className="space-y-6">
+                  {/* BigBallSports Feed Section */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="editorial-kicker text-[#00f2fe] flex items-center gap-1.5">
+                        <Zap size={12} />
+                        <span>BigBallSports Live Engine ({filteredBbsMatches.length} Matches)</span>
+                      </p>
+                      <span className="mono-font text-[10px] text-[#666]">
+                        PROVIDER: @bigballsdata/sdk
+                      </span>
+                    </div>
+
+                    {filteredBbsMatches.length === 0 ? (
+                      <div className="terminal-card p-8 text-center">
+                        <p className="text-xs text-[#888]">
+                          No matches found for BigBallSports in this category.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        {filteredBbsMatches.map((match, idx) => (
+                          <BigBallsMatchCard
+                            key={`bbs-${match.id || idx}`}
+                            match={match}
+                            onOpenStream={openLaLigaStream}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
 
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    {filteredBbsMatches.map((match, idx) => (
-                      <BigBallsMatchCard
-                        key={`${match.id || 'bbs'}-${idx}`}
-                        match={match}
-                        onOpenStream={openLaLigaStream}
-                      />
-                    ))}
+                  {/* SportMonks Fixtures Section */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="editorial-kicker text-[#00f2fe] flex items-center gap-1.5">
+                        <Calendar size={12} />
+                        <span>SportMonks Global Schedule ({filteredFixtures.length} Scheduled Fixtures)</span>
+                      </p>
+                      <span className="mono-font text-[10px] text-[#666]">
+                        PROVIDER: SportMonks API v3
+                      </span>
+                    </div>
+
+                    {filteredFixtures.length === 0 ? (
+                      <div className="terminal-card p-8 text-center">
+                        <p className="text-xs text-[#888]">
+                          No scheduled fixtures found for SportMonks in this {fixtureDays}-day window.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        {filteredFixtures.map((m, idx) => (
+                          <MatchCard
+                            key={`sm-fix-${m.id || idx}`}
+                            match={m}
+                            onOpen={openMatchCenter}
+                            onOpenStream={openLaLigaStream}
+                            type="fixture"
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -561,7 +582,7 @@ export default function LiveDataPage() {
             </div>
           )}
 
-          {/* TAB 1: LIVE SCORES (SportMonks) */}
+          {/* TAB: LIVE SCORES (SportMonks) */}
           {activeTab === 'livescores' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -579,10 +600,10 @@ export default function LiveDataPage() {
                   <p className="text-xs text-[#888] max-w-md mx-auto">
                     There are currently no active live matches broadcasting on SportMonks. Check{' '}
                     <button
-                      onClick={() => setActiveTab('bigballs')}
+                      onClick={() => setActiveTab('matchon')}
                       className="text-[#00f2fe] underline font-semibold"
                     >
-                      BigBallSports Fixtures
+                      MatchOn Fixtures
                     </button>{' '}
                     or view{' '}
                     <button
@@ -603,53 +624,6 @@ export default function LiveDataPage() {
                       onOpen={openMatchCenter}
                       onOpenStream={openLaLigaStream}
                       type="live"
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* TAB 2: UPCOMING FIXTURES (SportMonks) */}
-          {activeTab === 'fixtures' && (
-            <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <p className="editorial-kicker text-[#00f2fe]">
-                  Upcoming Fixtures ({filteredFixtures.length} matches scheduled)
-                </p>
-
-                {/* Day Range Filter */}
-                <div className="flex items-center gap-1.5 text-xs">
-                  <span className="text-[#888] mr-1">Window:</span>
-                  {[3, 7, 14, 21].map((d) => (
-                    <button
-                      key={d}
-                      onClick={() => setFixtureDays(d)}
-                      className={`px-2.5 py-1 border text-[11px] font-mono transition ${
-                        fixtureDays === d
-                          ? 'border-[#00f2fe] bg-[#00f2fe]/20 text-[#00f2fe]'
-                          : 'border-[#333] text-[#888] hover:text-white'
-                      }`}
-                    >
-                      {d} Days
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {filteredFixtures.length === 0 ? (
-                <div className="terminal-card p-12 text-center">
-                  <p className="text-xs text-[#888]">No upcoming fixtures found for this filter.</p>
-                </div>
-              ) : (
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {filteredFixtures.map((m, idx) => (
-                    <MatchCard
-                      key={`${m.id || 'fix'}-${idx}`}
-                      match={m}
-                      onOpen={openMatchCenter}
-                      onOpenStream={openLaLigaStream}
-                      type="fixture"
                     />
                   ))}
                 </div>

@@ -16,6 +16,7 @@ import { TransfersResponse } from '@/lib/types';
 import { formatEUR, formatDate } from '@/lib/format';
 import { TableSkeleton } from '@/components/ui/Skeleton';
 import { FaviconSearch } from '@/components/ui/FaviconSearch';
+import { UiverseButton } from '@/components/ui/UiverseButton';
 
 export default function TransfersPage() {
   const [data, setData] = useState<TransfersResponse | null>(null);
@@ -211,20 +212,24 @@ export default function TransfersPage() {
               </span>
 
               <div className="flex items-center gap-2">
-                <button
+                <UiverseButton
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1 || loading}
-                  className="btn-secondary py-1.5 px-3 disabled:opacity-40 flex items-center gap-1"
+                  size="sm"
+                  variant="default"
                 >
-                  <ChevronLeft size={14} /> Previous
-                </button>
-                <button
+                  <ChevronLeft size={13} />
+                  <span>Previous</span>
+                </UiverseButton>
+                <UiverseButton
                   onClick={() => setPage((p) => Math.min(data.total_pages, p + 1))}
                   disabled={page >= data.total_pages || loading}
-                  className="btn-secondary py-1.5 px-3 disabled:opacity-40 flex items-center gap-1"
+                  size="sm"
+                  variant="default"
                 >
-                  Next <ChevronRight size={14} />
-                </button>
+                  <span>Next</span>
+                  <ChevronRight size={13} />
+                </UiverseButton>
               </div>
             </div>
           </>

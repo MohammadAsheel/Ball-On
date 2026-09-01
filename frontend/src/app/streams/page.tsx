@@ -23,6 +23,7 @@ import {
   Flame,
 } from 'lucide-react';
 import { FaviconSearch } from '@/components/ui/FaviconSearch';
+import { UiverseButton } from '@/components/ui/UiverseButton';
 
 interface Channel {
   id: string;
@@ -518,15 +519,16 @@ export default function LiveStreamsPage() {
             <span>{CHANNELS.length} Channels Online</span>
           </div>
 
-          <a
+          <UiverseButton
             href={selectedChannel.embedUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/50 hover:bg-cyan-500/10 hover:text-cyan-300 transition"
+            size="sm"
+            variant="default"
           >
             <span>Popout Player</span>
             <ExternalLink size={13} />
-          </a>
+          </UiverseButton>
         </div>
       </div>
 
@@ -561,23 +563,25 @@ export default function LiveStreamsPage() {
 
             {/* Controls */}
             <div className="flex items-center gap-2">
-              <button
+              <UiverseButton
                 onClick={reloadPlayer}
-                className="flex h-8 items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 text-xs text-slate-300 hover:border-white/20 hover:bg-white/10 hover:text-white transition"
+                size="xs"
+                variant="default"
                 title="Reload Live Feed"
               >
                 <RotateCcw size={13} />
                 <span className="hidden sm:inline">Reload Feed</span>
-              </button>
+              </UiverseButton>
 
-              <button
+              <UiverseButton
                 onClick={() => setCinemaMode(!cinemaMode)}
-                className="flex h-8 items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 text-xs text-slate-300 hover:border-white/20 hover:bg-white/10 hover:text-white transition"
+                size="xs"
+                variant="default"
                 title="Toggle Cinema Mode"
               >
                 {cinemaMode ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
                 <span className="hidden sm:inline">{cinemaMode ? 'Standard' : 'Cinema'}</span>
-              </button>
+              </UiverseButton>
             </div>
           </div>
 
@@ -650,17 +654,14 @@ export default function LiveStreamsPage() {
             <Filter size={12} /> Filter:
           </span>
           {categories.map((cat) => (
-            <button
+            <UiverseButton
               key={cat}
+              size="sm"
+              active={categoryFilter === cat}
               onClick={() => setCategoryFilter(cat)}
-              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-                categoryFilter === cat
-                  ? 'border border-cyan-500/50 bg-cyan-500/20 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.2)]'
-                  : 'border border-white/5 bg-white/5 text-slate-400 hover:border-white/10 hover:text-white'
-              }`}
             >
               {cat === 'all' ? 'All Channels' : cat}
-            </button>
+            </UiverseButton>
           ))}
         </div>
 
@@ -735,16 +736,15 @@ export default function LiveStreamsPage() {
 
                 {/* Action button hover */}
                 <div className="mt-3">
-                  <button
-                    className={`w-full py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition ${
-                      isSelected
-                        ? 'bg-rose-500 text-white shadow-[0_0_15px_rgba(244,63,94,0.4)]'
-                        : 'bg-white/5 text-slate-300 group-hover:bg-cyan-500/20 group-hover:text-cyan-300 group-hover:border group-hover:border-cyan-500/30'
-                    }`}
+                  <UiverseButton
+                    variant={isSelected ? 'rose' : 'default'}
+                    size="xs"
+                    className="w-full"
+                    containerClassName="w-full"
                   >
                     <Play size={11} fill="currentColor" />
                     <span>{isSelected ? 'Now Playing' : 'Switch Channel'}</span>
-                  </button>
+                  </UiverseButton>
                 </div>
               </div>
             );
