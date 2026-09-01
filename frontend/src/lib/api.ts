@@ -7,8 +7,7 @@ import {
   StandingRow,
   ScorerRow,
   MatchRow,
-  ValuationPrediction,
-  PlayerEstimatorResult,
+  EstimatorResponse,
   ModelMetadata,
   ComparedPlayer,
   SportMonksMatch,
@@ -112,15 +111,15 @@ export const api = {
     prior_minutes: number;
     goals: number;
     assists: number;
-    use_market_value: boolean;
+    configuration: 'performance_only' | 'market_aware';
   }) =>
-    fetchJSON<ValuationPrediction>('/api/estimator/predict', {
+    fetchJSON<EstimatorResponse>('/api/estimator/predict', {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
 
   estimatePlayer: (playerId: number | string) =>
-    fetchJSON<PlayerEstimatorResult>(`/api/estimator/player/${playerId}`),
+    fetchJSON<EstimatorResponse>(`/api/estimator/player/${playerId}`),
 
   getModelMetadata: () => fetchJSON<ModelMetadata>('/api/estimator/models'),
 

@@ -1,275 +1,126 @@
-"""
-BALLON Valuation Engine — Model Training & Evaluation Pipeline
+"""Reproducible, chronological training for the BALLON valuation engine."""
 
-Trains baseline models and log-target regression models on qualified permanent transfers
-using a strict chronological split (train < 2022-07-01, test >= 2022-07-01).
-Evaluates Performance-Only and Market-Aware feature sets and exports models and authentic metrics.
-"""
+from __future__ import annotations
 
 import json
 import sqlite3
-from pathlib import Path
-from typing import Dict, Tuple
+from datetime import date, datetime, timezone
+from typing import Any
 
 import joblib
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.dummy import DummyRegressor
-from sklearn.linear_model import LinearRegression, Ridge
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import ElasticNet, LinearRegression, Ridge
+from sklearn.metrics import mean_absolute_error, median_absolute_error, mean_squared_error, r2_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from src.config import DATABASE_PATH, MODEL_DIR, TRAIN_TEST_SPLIT_DATE
-from src.utils.logging_config import get_logger
+from src.config import DATABASE_PATH, MODEL_DIR, RANDOM_SEED, TRAIN_TEST_SPLIT_DATE
+from src.models.wrappers import LogTargetRegressor
+from src.valuation.data_snapshot import FEATURE_COLUMNS, MARKET_FEATURE_COLUMNS, load_paid_transfer_snapshots
+from src.valuation.registry import register_model
 
-logger = get_logger(__name__)
-
-
-def load_qualified_transfer_dataset(conn: sqlite3.Connection) -> pd.DataFrame:
-    """
-    Extract qualified permanent paid transfers with pre-transfer performance statistics.
-    All metrics are strictly pre-transfer to prevent data leakage.
-    """
-    query = """
-    WITH PreTransferStats AS (
-        SELECT 
-            t.player_id,
-            t.transfer_date,
-            COUNT(a.appearance_id) AS prior_appearances,
-            COALESCE(SUM(a.minutes_played), 0) AS prior_minutes,
-            COALESCE(SUM(a.goals), 0) AS prior_goals,
-            COALESCE(SUM(a.assists), 0) AS prior_assists
-        FROM transfers t
-        LEFT JOIN appearances a 
-            ON t.player_id = a.player_id 
-            AND a.date < t.transfer_date
-            AND a.date >= DATE(t.transfer_date, '-365 days')
-        WHERE t.transfer_fee IS NOT NULL AND t.transfer_fee > 0
-        GROUP BY t.player_id, t.transfer_date
-    )
-    SELECT 
-        t.player_id,
-        p.name AS player_name,
-        p.position,
-        p.sub_position,
-        p.date_of_birth,
-        t.transfer_date,
-        t.transfer_season,
-        t.from_club_name,
-        t.to_club_name,
-        t.transfer_fee,
-        t.market_value_in_eur AS market_value_before,
-        ROUND((JULIANDAY(t.transfer_date) - JULIANDAY(p.date_of_birth)) / 365.25, 1) AS age_at_transfer,
-        COALESCE(s.prior_appearances, 0) AS prior_appearances,
-        COALESCE(s.prior_minutes, 0) AS prior_minutes,
-        COALESCE(s.prior_goals, 0) AS prior_goals,
-        COALESCE(s.prior_assists, 0) AS prior_assists
-    FROM transfers t
-    JOIN players p ON t.player_id = p.player_id
-    LEFT JOIN PreTransferStats s 
-        ON t.player_id = s.player_id 
-        AND t.transfer_date = s.transfer_date
-    WHERE t.transfer_fee IS NOT NULL 
-      AND t.transfer_fee >= 100000
-      AND p.date_of_birth IS NOT NULL
-      AND t.transfer_date IS NOT NULL
-    """
-    logger.info("Extracting qualified transfers from SQLite...")
-    df = pd.read_sql_query(query, conn)
-
-    # Feature engineering
-    df["position"] = df["position"].fillna("Missing")
-    df["market_value_before"] = df["market_value_before"].fillna(0)
-    
-    # Safe per-90 rates
-    df["goals_per_90"] = np.where(
-        df["prior_minutes"] >= 270,
-        (df["prior_goals"] / df["prior_minutes"]) * 90,
-        0.0,
-    )
-    df["assists_per_90"] = np.where(
-        df["prior_minutes"] >= 270,
-        (df["prior_assists"] / df["prior_minutes"]) * 90,
-        0.0,
-    )
-
-    # Clean age
-    df["age_at_transfer"] = df["age_at_transfer"].clip(lower=15, upper=42)
-
-    logger.info(f"Loaded {len(df):,} qualified transfers for modeling.")
-    return df
+MODEL_VERSION = "ballon-valuation-v2"
 
 
-class LogTargetRegressor:
-    """Wrapper that fits on log1p(y) and predicts via expm1(y_pred)."""
-
-    def __init__(self, base_regressor):
-        self.base_regressor = base_regressor
-
-    def fit(self, X, y):
-        log_y = np.log1p(np.maximum(0, y))
-        self.base_regressor.fit(X, log_y)
-        return self
-
-    def predict(self, X):
-        log_pred = self.base_regressor.predict(X)
-        return np.expm1(np.maximum(0, log_pred))
-
-    @property
-    def named_steps(self):
-        return self.base_regressor.named_steps
+def _pipeline(numeric_features: list[str], estimator: Any) -> Pipeline:
+    return Pipeline([
+        ("prep", ColumnTransformer([
+            ("num", Pipeline([("impute", SimpleImputer(strategy="median")), ("scale", StandardScaler())]), numeric_features),
+            ("cat", Pipeline([("impute", SimpleImputer(strategy="most_frequent")),
+                               ("encode", OneHotEncoder(handle_unknown="ignore"))]), ["position"]),
+        ])),
+        ("reg", estimator),
+    ])
 
 
-def train_and_evaluate_all():
-    conn = sqlite3.connect(str(DATABASE_PATH))
-    df = load_qualified_transfer_dataset(conn)
-    conn.close()
-
-    # Chronological Split
-    train_mask = df["transfer_date"] < TRAIN_TEST_SPLIT_DATE
-    test_mask = df["transfer_date"] >= TRAIN_TEST_SPLIT_DATE
-
-    df_train = df[train_mask].copy()
-    df_test = df[test_mask].copy()
-
-    logger.info(
-        f"Chronological split at {TRAIN_TEST_SPLIT_DATE}: "
-        f"Train={len(df_train):,} transfers, Test={len(df_test):,} transfers"
-    )
-
-    # Feature definitions
-    num_features_perf = ["age_at_transfer", "prior_minutes", "goals_per_90", "assists_per_90"]
-    cat_features = ["position"]
-
-    # Preprocessing pipelines
-    preprocessor_perf = ColumnTransformer(
-        transformers=[
-            ("num", StandardScaler(), num_features_perf),
-            ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), cat_features),
-        ]
-    )
-
-    # Market-aware includes log(1 + market_value_before)
-    df_train["log_market_value_before"] = np.log1p(df_train["market_value_before"])
-    df_test["log_market_value_before"] = np.log1p(df_test["market_value_before"])
-    num_features_market = num_features_perf + ["log_market_value_before"]
-
-    preprocessor_market = ColumnTransformer(
-        transformers=[
-            ("num", StandardScaler(), num_features_market),
-            ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), cat_features),
-        ]
-    )
-
-    y_train = df_train["transfer_fee"].values
-    y_test = df_test["transfer_fee"].values
-
-    models_to_train = {
-        "Baseline_Mean": DummyRegressor(strategy="mean"),
-        "Baseline_Median": DummyRegressor(strategy="median"),
-        "LinearRegression_PerfOnly": Pipeline([
-            ("prep", preprocessor_perf),
-            ("reg", LinearRegression()),
-        ]),
-        "Ridge_PerfOnly": Pipeline([
-            ("prep", preprocessor_perf),
-            ("reg", Ridge(alpha=10.0)),
-        ]),
-        "LogLinear_PerfOnly": LogTargetRegressor(
-            Pipeline([
-                ("prep", preprocessor_perf),
-                ("reg", LinearRegression()),
-            ])
-        ),
-        "LogRidge_PerfOnly": LogTargetRegressor(
-            Pipeline([
-                ("prep", preprocessor_perf),
-                ("reg", Ridge(alpha=10.0)),
-            ])
-        ),
-        "LogRidge_MarketAware": LogTargetRegressor(
-            Pipeline([
-                ("prep", preprocessor_market),
-                ("reg", Ridge(alpha=10.0)),
-            ])
-        ),
+def _metrics(actual: np.ndarray, predicted: np.ndarray) -> dict[str, float]:
+    return {
+        "mae_eur": round(float(mean_absolute_error(actual, predicted)), 2),
+        "rmse_eur": round(float(np.sqrt(mean_squared_error(actual, predicted))), 2),
+        "r2": round(float(r2_score(actual, predicted)), 4),
+        "median_absolute_error_eur": round(float(median_absolute_error(actual, predicted)), 2),
     }
 
-    results = {}
 
-    for name, model in models_to_train.items():
-        if "MarketAware" in name:
-            X_tr = df_train[num_features_market + cat_features]
-            X_te = df_test[num_features_market + cat_features]
-        else:
-            X_tr = df_train[num_features_perf + cat_features]
-            X_te = df_test[num_features_perf + cat_features]
+def _split(frame: pd.DataFrame):
+    # The final test window is never used for model selection.
+    train = frame[frame.transfer_date < "2021-07-01"].copy()
+    validation = frame[(frame.transfer_date >= "2021-07-01") & (frame.transfer_date < TRAIN_TEST_SPLIT_DATE)].copy()
+    test = frame[frame.transfer_date >= TRAIN_TEST_SPLIT_DATE].copy()
+    return train, validation, test
 
-        model.fit(X_tr, y_train)
-        preds = model.predict(X_te)
-        preds = np.maximum(0, preds)
 
-        r2 = float(r2_score(y_test, preds))
-        mae = float(mean_absolute_error(y_test, preds))
-        rmse = float(np.sqrt(mean_squared_error(y_test, preds)))
+def train_and_evaluate_all(as_of_date: str | None = None) -> dict[str, Any]:
+    """Train candidates using snapshots known before each transfer date."""
+    as_of_date = as_of_date or date.today().isoformat()
+    with sqlite3.connect(str(DATABASE_PATH)) as conn:
+        frame = load_paid_transfer_snapshots(conn, as_of_date)
+    frame = frame.dropna(subset=["transfer_fee", "transfer_date", "age_at_transfer"])
+    train, validation, test = _split(frame)
+    if min(len(train), len(validation), len(test)) < 2:
+        raise RuntimeError("Insufficient chronological data to train and evaluate valuation models.")
 
-        results[name] = {
-            "model_name": name,
-            "R2": round(r2, 4),
-            "MAE": round(mae, 2),
-            "RMSE": round(rmse, 2),
-        }
-        logger.info(f"[{name}] Test R²={r2:.4f} | MAE=€{mae:,.0f} | RMSE=€{rmse:,.0f}")
-
-    # Extract coefficients from LogRidge_MarketAware for honest feature impact reporting
-    market_model = models_to_train["LogRidge_MarketAware"]
-    fitted_prep = market_model.named_steps["prep"]
-    fitted_reg = market_model.named_steps["reg"]
-
-    ohe_categories = fitted_prep.named_transformers_["cat"].get_feature_names_out(cat_features).tolist()
-    feature_names = num_features_market + ohe_categories
-    coefficients = fitted_reg.coef_.tolist()
-
-    feature_weights = [
-        {
-            "feature": f,
-            "weight": round(w, 4),
-            "direction": "Positive" if w > 0 else "Negative",
-            "relative_importance": round(abs(w), 4),
-        }
-        for f, w in sorted(zip(feature_names, coefficients), key=lambda x: abs(x[1]), reverse=True)
-    ]
-
-    # Save artifacts
-    MODEL_DIR.mkdir(parents=True, exist_ok=True)
-    
-    market_model_path = MODEL_DIR / "valuation_market_aware.joblib"
-    perf_model_path = MODEL_DIR / "valuation_perf_only.joblib"
-    meta_path = MODEL_DIR / "model_metadata.json"
-
-    joblib.dump(market_model, market_model_path)
-    joblib.dump(models_to_train["LogRidge_PerfOnly"], perf_model_path)
-
-    metadata = {
-        "split_date": TRAIN_TEST_SPLIT_DATE,
-        "train_samples": int(len(df_train)),
-        "test_samples": int(len(df_test)),
-        "models_benchmark": results,
-        "market_aware_coefficients": feature_weights,
-        "features": {
-            "performance_only": num_features_perf + cat_features,
-            "market_aware": num_features_market + cat_features,
-        },
+    perf_features = FEATURE_COLUMNS
+    market_features = MARKET_FEATURE_COLUMNS
+    candidates: dict[str, tuple[Any, list[str]]] = {
+        "mean_baseline": (DummyRegressor(strategy="mean"), perf_features),
+        "median_baseline": (DummyRegressor(strategy="median"), perf_features),
+        "linear_performance_only": (LogTargetRegressor(_pipeline([f for f in perf_features if f != "position"], LinearRegression())), perf_features),
+        "ridge_performance_only": (LogTargetRegressor(_pipeline([f for f in perf_features if f != "position"], Ridge(alpha=10.0))), perf_features),
+        "elastic_net_performance_only": (LogTargetRegressor(_pipeline([f for f in perf_features if f != "position"], ElasticNet(alpha=0.03, l1_ratio=0.2, random_state=RANDOM_SEED))), perf_features),
+        "random_forest_performance_only": (LogTargetRegressor(_pipeline([f for f in perf_features if f != "position"], RandomForestRegressor(n_estimators=150, min_samples_leaf=4, random_state=RANDOM_SEED, n_jobs=-1))), perf_features),
+        "ridge_market_aware": (LogTargetRegressor(_pipeline([f for f in market_features if f != "position"], Ridge(alpha=10.0))), market_features),
     }
+    validation_results: dict[str, dict[str, float]] = {}
+    fitted: dict[str, Any] = {}
+    for name, (model, features) in candidates.items():
+        model.fit(train[features], train.transfer_fee)
+        validation_results[name] = _metrics(validation.transfer_fee.to_numpy(), model.predict(validation[features]))
+        fitted[name] = model
 
-    with open(meta_path, "w", encoding="utf-8") as f:
-        json.dump(metadata, f, indent=2)
+    perf_names = [name for name in validation_results if name.endswith("performance_only")]
+    selected_perf = min(perf_names, key=lambda name: validation_results[name]["mae_eur"])
+    selected = {"performance_only": selected_perf, "market_aware": "ridge_market_aware"}
+    test_results = {name: _metrics(test.transfer_fee.to_numpy(), model.predict(test[candidates[name][1]])) for name, model in fitted.items()}
 
-    logger.info(f"Model artifacts successfully saved to {MODEL_DIR}")
+    development = pd.concat([train, validation], ignore_index=True)
+    artifacts = {}
+    for config, name in selected.items():
+        model, features = candidates[name]
+        model.fit(development[features], development.transfer_fee)
+        path = MODEL_DIR / f"valuation_{config}.joblib"
+        MODEL_DIR.mkdir(parents=True, exist_ok=True)
+        joblib.dump(model, path)
+        artifacts[config] = {"model_name": name, "path": path.name, "features": features}
+
+    metadata: dict[str, Any] = {
+        "model_version": MODEL_VERSION,
+        "training_date": datetime.now(timezone.utc).isoformat(),
+        "dataset_version": "transfermarkt-sqlite-source",
+        "as_of_date": as_of_date,
+        "transfer_type_limitation": "The source transfers table has no transfer_type column. Training rows are known positive-fee paid-transfer proxies, not verified permanent-only transfers.",
+        "target": "log1p(transfer_fee_eur)",
+        "random_seed": RANDOM_SEED,
+        "periods": {"train_end_exclusive": "2021-07-01", "validation": ["2021-07-01", TRAIN_TEST_SPLIT_DATE], "test_start": TRAIN_TEST_SPLIT_DATE},
+        "sample_counts": {"all_paid_transfer_proxies": int(len(frame)), "train": int(len(train)), "validation": int(len(validation)), "test": int(len(test))},
+        "validation_results": validation_results,
+        "test_results": test_results,
+        "selected_models": selected,
+        "artifacts": artifacts,
+        "feature_schema": {"performance_only": perf_features, "market_aware": market_features},
+        "data_quality_method": "Completeness score based on pre-snapshot market value, position, age, and at least 270 pre-transfer minutes; this is not prediction confidence.",
+    }
+    with open(MODEL_DIR / "model_metadata.json", "w", encoding="utf-8") as output:
+        json.dump(metadata, output, indent=2)
+    with sqlite3.connect(str(DATABASE_PATH)) as conn:
+        register_model(conn, metadata)
     return metadata
 
 
 if __name__ == "__main__":
-    train_and_evaluate_all()
+    print(json.dumps(train_and_evaluate_all(), indent=2))

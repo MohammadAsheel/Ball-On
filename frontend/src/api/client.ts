@@ -8,11 +8,10 @@
 export { api } from '@/lib/api';
 export type {
   ComparedPlayer,
-  PlayerEstimatorResult,
+  EstimatorResponse,
   PlayerProfile,
   PlayerSearchItem,
   TransfersResponse,
-  ValuationPrediction,
   SportMonksMatch,
   SportMonksMatchesResponse,
   SportMonksEvent,
