@@ -23,22 +23,7 @@ export default function PlayerComparisonPage() {
   const [searchResults, setSearchResults] = useState<PlayerSearchItem[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Initialize with 2 top players if empty
-  useEffect(() => {
-    async function initComparison() {
-      try {
-        const res = await api.searchPlayers('Mbapp', 1);
-        const res2 = await api.searchPlayers('Bellingham', 1);
-        const ids: number[] = [];
-        if (res.players.length > 0) ids.push(res.players[0].player_id);
-        if (res2.players.length > 0) ids.push(res2.players[0].player_id);
-        setSelectedIds(ids);
-      } catch (err) {
-        console.error('Failed to init comparison:', err);
-      }
-    }
-    initComparison();
-  }, []);
+
 
   // Fetch comparison vector whenever selected IDs change
   useEffect(() => {

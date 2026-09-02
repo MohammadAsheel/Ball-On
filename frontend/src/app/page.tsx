@@ -20,13 +20,6 @@ import { formatEUR } from '@/lib/format';
 import { FaviconSearch } from '@/components/ui/FaviconSearch';
 import { UiverseButton } from '@/components/ui/UiverseButton';
 
-const samplePlayers: PlayerSearchItem[] = [
-  { player_id: 1, name: 'Kylian Mbappé', current_club_name: 'Real Madrid', position: 'Attack', sub_position: null, date_of_birth: null, age: 27, country_of_citizenship: 'France', market_value_in_eur: 180000000, image_url: null },
-  { player_id: 2, name: 'Erling Haaland', current_club_name: 'Manchester City', position: 'Attack', sub_position: null, date_of_birth: null, age: 26, country_of_citizenship: 'Norway', market_value_in_eur: 175000000, image_url: null },
-  { player_id: 3, name: 'Jude Bellingham', current_club_name: 'Real Madrid', position: 'Midfield', sub_position: null, date_of_birth: null, age: 23, country_of_citizenship: 'England', market_value_in_eur: 160000000, image_url: null },
-  { player_id: 4, name: 'Lamine Yamal', current_club_name: 'FC Barcelona', position: 'Attack', sub_position: null, date_of_birth: null, age: 19, country_of_citizenship: 'Spain', market_value_in_eur: 150000000, image_url: null },
-];
-
 function Tuner({
   label,
   value,
@@ -65,14 +58,16 @@ function Tuner({
 
 export default function OverviewPage() {
   const [overview, setOverview] = useState<OverviewData | null>(null);
-  const [players, setPlayers] = useState<PlayerSearchItem[]>(samplePlayers);
+  const [players, setPlayers] = useState<PlayerSearchItem[]>([]);
   const [age, setAge] = useState(24);
   const [goals, setGoals] = useState(18);
-  const [league, setLeague] = useState(82);
-  const [risk, setRisk] = useState(12);
+  const [assists, setAssists] = useState(8);
+  const [minutes, setMinutes] = useState(2500);
   const [view, setView] = useState<'grid' | 'table'>('grid');
   const [search, setSearch] = useState('');
   const [era, setEra] = useState('All Players');
+  const [estimatedValue, setEstimatedValue] = useState<number | null>(null);
+  const [isEstimating, setIsEstimating] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -95,20 +90,34 @@ export default function OverviewPage() {
     return () => clearTimeout(id);
   }, [search]);
 
-  const value = useMemo(
-    () =>
-      Math.max(
-        5,
-        Math.round(
-          125 +
-            (goals - 18) * 2.2 -
-            Math.max(0, age - 24) * 5.5 +
-            (league - 82) * 0.7 -
-            risk * 0.8
-        )
-      ),
-    [age, goals, league, risk]
-  );
+  useEffect(() => {
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      setIsEstimating(true);
+      try {
+        const res = await api.predictScenario({
+          name: 'Custom Player',
+          age,
+          position: 'Attack',
+          market_value_before: 25000000,
+          prior_minutes: minutes,
+          goals,
+          assists,
+          configuration: 'market_aware'
+        }, { signal: controller.signal });
+        setEstimatedValue(res.valuation.estimated_transfer_value);
+      } catch (err: any) {
+        if (err.name !== 'AbortError') console.error(err);
+      } finally {
+        setIsEstimating(false);
+      }
+    }, 400);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [age, goals, assists, minutes]);
 
   const filtered = useMemo(() => {
     return players.filter((p) => {
@@ -123,7 +132,7 @@ export default function OverviewPage() {
     });
   }, [players, search, era]);
 
-  const title = overview?.transfer_intelligence?.highest_fee_player || 'Kylian Mbappé';
+  const title = overview?.transfer_intelligence?.highest_fee_player || 'Loading...';
 
   return (
     <div className="space-y-10 pb-12">
@@ -152,7 +161,7 @@ export default function OverviewPage() {
             <div>
               <p className="editorial-kicker text-slate-400">Tracked Entities</p>
               <p className="mono-font mt-1.5 text-2xl sm:text-3xl font-bold text-white">
-                {(overview?.kpis?.total_players || 50000).toLocaleString()}
+                {overview?.kpis?.total_players ? overview.kpis.total_players.toLocaleString() : '...'}
                 <span className="text-emerald-400 font-normal">+</span>
               </p>
             </div>
@@ -189,34 +198,35 @@ export default function OverviewPage() {
             <div className="mt-8 grid gap-6 md:grid-cols-[1.1fr_0.9fr]">
               <div>
                 <p className="editorial-kicker text-slate-400">Algorithm Valuation</p>
-                <p className="mono-font mt-2 text-5xl sm:text-6xl font-extrabold tracking-tight text-white">
-                  €{value}
-                  <span className="ml-1 text-2xl font-semibold text-slate-500">M</span>
+                <p className="mono-font mt-2 text-4xl sm:text-5xl font-extrabold tracking-tight text-white line-clamp-1">
+                  {estimatedValue !== null ? formatEUR(estimatedValue) : '...'}
                 </p>
                 <div className="mt-5 flex items-center gap-3">
                   <span className="mono-font inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-400">
-                    <TrendingUp size={13} /> +12.8% EDGE
+                    <TrendingUp size={13} /> ESTIMATE
                   </span>
-                  <span className="text-xs text-slate-400">vs market baseline</span>
+                  <span className="text-xs text-slate-400">
+                    {isEstimating ? 'Calculating...' : 'Synced with Engine'}
+                  </span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2.5">
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3.5">
-                  <p className="editorial-kicker text-slate-400">Market Value</p>
-                  <p className="mono-font mt-1.5 text-lg font-bold text-white">€{Math.round(value * 0.88)}M</p>
+                  <p className="editorial-kicker text-slate-400">Prior Market</p>
+                  <p className="mono-font mt-1.5 text-lg font-bold text-white">€25M</p>
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3.5">
-                  <p className="editorial-kicker text-slate-400">Confidence</p>
-                  <p className="mono-font mt-1.5 text-lg font-bold text-emerald-400">91.4%</p>
+                  <p className="editorial-kicker text-slate-400">Status</p>
+                  <p className="mono-font mt-1.5 text-sm font-bold text-emerald-400">{isEstimating ? 'BUSY' : 'READY'}</p>
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3.5">
                   <p className="editorial-kicker text-slate-400">Model Drift</p>
                   <p className="mono-font mt-1.5 text-lg font-bold text-cyan-400">LOW</p>
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3.5">
-                  <p className="editorial-kicker text-slate-400">Sample Depth</p>
-                  <p className="mono-font mt-1.5 text-lg font-bold text-white">2,481</p>
+                  <p className="editorial-kicker text-slate-400">Data Quality</p>
+                  <p className="mono-font mt-1.5 text-sm font-bold text-white">HIGH</p>
                 </div>
               </div>
             </div>
@@ -224,10 +234,10 @@ export default function OverviewPage() {
 
           <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-white/[0.08] pt-6">
             {[
-              ['GOALS / SEASON', goals],
               ['AGE CURVE', `${age}Y`],
-              ['CONTRACT LEFT', '3.8Y'],
-              ['LEAGUE COEFF', `${league}/100`],
+              ['MINUTES PLAYED', `${minutes}'`],
+              ['GOALS / SEASON', goals],
+              ['ASSISTS / SEASON', assists],
             ].map(([k, v]) => (
               <div key={String(k)} className="rounded-lg bg-white/[0.02] p-2.5 border border-white/[0.04]">
                 <p className="editorial-kicker text-slate-400 text-[9px]">{k}</p>
@@ -251,10 +261,10 @@ export default function OverviewPage() {
             </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <Tuner label="Age curve" value={age} min={17} max={36} suffix=" yrs" onChange={setAge} />
-              <Tuner label="Goals / season" value={goals} min={0} max={45} onChange={setGoals} />
-              <Tuner label="League coefficient" value={league} min={40} max={100} suffix=" /100" onChange={setLeague} />
-              <Tuner label="Injury risk index" value={risk} min={0} max={50} suffix="%" onChange={setRisk} />
+              <Tuner label="Age curve" value={age} min={16} max={40} suffix=" yrs" onChange={setAge} />
+              <Tuner label="Minutes played" value={minutes} min={0} max={4000} suffix="'" onChange={setMinutes} />
+              <Tuner label="Goals" value={goals} min={0} max={50} onChange={setGoals} />
+              <Tuner label="Assists" value={assists} min={0} max={30} onChange={setAssists} />
             </div>
           </div>
 
@@ -262,7 +272,7 @@ export default function OverviewPage() {
             <div className="flex items-center justify-between text-xs mb-4">
               <span className="text-slate-400">Estimated Confidence Band</span>
               <span className="mono-font font-bold text-white">
-                €{value - 9}M — €{value + 12}M
+                {estimatedValue ? `€${Math.round(estimatedValue / 1000000 - 3)}M — €${Math.round(estimatedValue / 1000000 + 4)}M` : '...'}
               </span>
             </div>
             <UiverseButton
@@ -335,7 +345,11 @@ export default function OverviewPage() {
         </div>
 
         {/* Grid or Table View */}
-        {view === 'grid' ? (
+        {players.length === 0 ? (
+           <div className="py-20 text-center text-slate-400">
+             <p className="font-semibold text-white">Loading database or no players found...</p>
+           </div>
+        ) : view === 'grid' ? (
           <div className="grid gap-4 p-6 sm:grid-cols-2 xl:grid-cols-4">
             {filtered.slice(0, 4).map((player, i) => (
               <Link
@@ -363,27 +377,12 @@ export default function OverviewPage() {
                   <p className="mt-1 text-xs text-slate-400 line-clamp-1">
                     {player.current_club_name || 'Free Agent'} · {player.position}
                   </p>
-
-                  <div className="mt-4 grid grid-cols-3 rounded-xl border border-white/[0.06] bg-white/[0.02] py-2.5 text-center">
-                    <div>
-                      <p className="editorial-kicker text-[9px] text-slate-400">APP</p>
-                      <p className="mono-font mt-0.5 text-xs font-bold text-slate-200">{28 + i}</p>
-                    </div>
-                    <div className="border-x border-white/[0.06]">
-                      <p className="editorial-kicker text-[9px] text-slate-400">GOALS</p>
-                      <p className="mono-font mt-0.5 text-xs font-bold text-slate-200">{18 - i * 2}</p>
-                    </div>
-                    <div>
-                      <p className="editorial-kicker text-[9px] text-slate-400">ASSISTS</p>
-                      <p className="mono-font mt-0.5 text-xs font-bold text-slate-200">{7 + i}</p>
-                    </div>
-                  </div>
                 </div>
 
                 <div className="relative z-10 mt-4 flex items-center justify-between border-t border-white/[0.06] pt-3.5">
                   <span className="editorial-kicker text-[9px] text-slate-400">Market Value</span>
                   <span className="mono-font text-sm font-bold text-emerald-400">
-                    {formatEUR(player.market_value_in_eur)}
+                    {player.market_value_in_eur ? formatEUR(player.market_value_in_eur) : 'N/A'}
                   </span>
                 </div>
               </Link>
@@ -398,8 +397,6 @@ export default function OverviewPage() {
                   <th>Club / Position</th>
                   <th>Age</th>
                   <th>Market Value</th>
-                  <th>Model Estimate</th>
-                  <th>Signal</th>
                 </tr>
               </thead>
               <tbody>
@@ -411,15 +408,7 @@ export default function OverviewPage() {
                     </td>
                     <td className="mono-font text-xs text-slate-400">{p.age || '—'}</td>
                     <td className="mono-font text-xs font-bold text-emerald-400">
-                      {formatEUR(p.market_value_in_eur)}
-                    </td>
-                    <td className="mono-font text-xs font-semibold text-slate-200">
-                      {formatEUR((p.market_value_in_eur || 0) * (1.06 + i / 100))}
-                    </td>
-                    <td>
-                      <span className="mono-font rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
-                        BULLISH
-                      </span>
+                      {p.market_value_in_eur ? formatEUR(p.market_value_in_eur) : 'N/A'}
                     </td>
                   </tr>
                 ))}
@@ -431,8 +420,7 @@ export default function OverviewPage() {
         {/* Catalog Footer */}
         <div className="flex items-center justify-between border-t border-white/[0.08] px-6 py-4">
           <span className="mono-font text-[11px] text-slate-500">
-            DISPLAYING 1—{Math.min(4, filtered.length)} /{' '}
-            {overview?.kpis?.total_players?.toLocaleString() || '50,000+'}
+            DISPLAYING {Math.min(filtered.length, 4)} RESULTS
           </span>
           <UiverseButton
             href="/players"

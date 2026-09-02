@@ -65,7 +65,7 @@ export default function PlayersDirectoryPage() {
             Player Intelligence Catalog
           </h1>
           <p className="text-sm text-slate-400 mt-1.5 max-w-2xl">
-            Explore and evaluate over 50,000 professional players with real-time valuation metrics, performance telemetry, and machine-learning transfer estimates.
+            Explore and evaluate our extensive database of professional players with real-time valuation metrics, performance telemetry, and machine-learning transfer estimates.
           </p>
         </div>
         <div className="flex items-center gap-2 self-start sm:self-auto rounded-xl border border-white/[0.08] bg-white/[0.03] px-3.5 py-2">

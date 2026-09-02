@@ -22,8 +22,11 @@ import {
   FootballNewsArticle,
 } from './types';
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
+if (!API_BASE_URL) {
+  throw new Error('NEXT_PUBLIC_API_URL environment variable is not defined.');
+}
 
 async function fetchJSON<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
@@ -44,7 +47,9 @@ async function fetchJSON<T>(endpoint: string, options?: RequestInit): Promise<T>
 
     return await res.json();
   } catch (err: any) {
-    console.error(`Fetch error on ${url}:`, err.message);
+    if (err.name !== 'AbortError') {
+      console.error(`Fetch error on ${url}:`, err.message);
+    }
     throw err;
   }
 }
@@ -112,10 +117,11 @@ export const api = {
     goals: number;
     assists: number;
     configuration: 'performance_only' | 'market_aware';
-  }) =>
+  }, options?: RequestInit) =>
     fetchJSON<EstimatorResponse>('/api/estimator/predict', {
       method: 'POST',
       body: JSON.stringify(payload),
+      ...options,
     }),
 
   estimatePlayer: (playerId: number | string) =>
