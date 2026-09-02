@@ -92,3 +92,20 @@ def test_scenario_uses_model_and_discloses_transform():
     assert valuation["model_type"] == "ridge_market_aware"
     assert valuation["target_transform"] == "log1p(transfer_fee_eur)"
     assert valuation["model_explanation"]["contributions"]
+
+
+def test_finalise_snapshot_handles_decimal_market_value():
+    from decimal import Decimal
+    import numpy as np
+    import pandas as pd
+    from src.valuation.data_snapshot import finalise_snapshot
+
+    df = pd.DataFrame([
+        {"market_value_before": Decimal("50000000.00")},
+        {"market_value_before": None},
+    ])
+    result = finalise_snapshot(df)
+    assert not isinstance(result["market_value_before"].iloc[0], Decimal)
+    assert np.isclose(result["log_market_value_before"].iloc[0], np.log1p(50000000.0))
+    assert pd.isna(result["log_market_value_before"].iloc[1])
+
