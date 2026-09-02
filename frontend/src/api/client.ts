@@ -5,7 +5,7 @@
  * The existing library import remains as a compatibility export while routes
  * migrate; keeping this boundary prevents UI modules from coupling to URLs.
  */
-export { api } from '@/lib/api';
+export { api, API_BASE_URL, API_URL } from '@/lib/api';
 export type {
   ComparedPlayer,
   EstimatorResponse,
