@@ -2,29 +2,19 @@
 FastAPI Router for Clubs & Stadiums
 """
 
-import sqlite3
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
-from src.config import DATABASE_PATH
+from src.database import get_db
 
 router = APIRouter(prefix="/api/clubs", tags=["Clubs"])
 
 
-def get_db():
-    if not DATABASE_PATH.exists():
-        raise HTTPException(status_code=500, detail="Database file not found.")
-    conn = sqlite3.connect(str(DATABASE_PATH))
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
 @router.get("")
-def get_clubs(limit: int = 20):
+def get_clubs(limit: int = 20, db: Session = Depends(get_db)):
     """Get top clubs by squad valuation and largest stadiums."""
-    conn = get_db()
-    cursor = conn.cursor()
-
-    cursor.execute(
+    squad_stmt = text(
         """
         SELECT 
             club_id,
@@ -38,13 +28,13 @@ def get_clubs(limit: int = 20):
         FROM clubs
         WHERE total_market_value IS NOT NULL AND total_market_value > 0
         ORDER BY total_market_value DESC
-        LIMIT ?
-        """,
-        (limit,),
+        LIMIT :limit
+        """
     )
-    top_squads = [dict(row) for row in cursor.fetchall()]
+    squad_res = db.execute(squad_stmt, {"limit": limit})
+    top_squads = [dict(row) for row in squad_res.mappings().all()]
 
-    cursor.execute(
+    stadium_stmt = text(
         """
         SELECT 
             name AS club_name,
@@ -53,11 +43,10 @@ def get_clubs(limit: int = 20):
         FROM clubs
         WHERE stadium_seats IS NOT NULL AND stadium_seats > 35000
         ORDER BY stadium_seats DESC
-        LIMIT ?
-        """,
-        (limit,),
+        LIMIT :limit
+        """
     )
-    stadiums = [dict(row) for row in cursor.fetchall()]
+    stadium_res = db.execute(stadium_stmt, {"limit": limit})
+    stadiums = [dict(row) for row in stadium_res.mappings().all()]
 
-    conn.close()
     return {"top_squads": top_squads, "stadiums": stadiums}
