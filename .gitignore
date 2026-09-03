@@ -97,9 +97,6 @@ backend/.env
 backend/data/raw/*
 backend/db/*.db
 
-# Generated ML artifacts
-backend/models/*.joblib
-
 
 # Ball-On backend local/generated data
 backend/.env
@@ -108,5 +105,4 @@ backend/.env
 backend/data/raw/*
 backend/db/*.db
 
-# Generated ML model binaries
-backend/models/*.joblib
+

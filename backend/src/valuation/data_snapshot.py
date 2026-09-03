@@ -106,8 +106,11 @@ def finalise_snapshot(frame: pd.DataFrame) -> pd.DataFrame:
     if "prior_assists" in frame.columns:
         frame["assists_per_90"] = (frame["prior_assists"] / minutes.where(eligible, 1) * 90).where(eligible, 0.0)
     if "market_value_before" in frame.columns:
-        frame["log_market_value_before"] = frame["market_value_before"].clip(lower=0).map(
-            lambda value: np.log1p(value) if pd.notna(value) else np.nan
+        frame["market_value_before"] = pd.to_numeric(
+            frame["market_value_before"], errors="coerce"
+        )
+        frame["log_market_value_before"] = np.log1p(
+            frame["market_value_before"].clip(lower=0)
         )
     return frame
 
