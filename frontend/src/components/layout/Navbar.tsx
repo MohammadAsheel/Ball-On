@@ -2,18 +2,37 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, X, Activity, Menu } from 'lucide-react';
+import {
+  Search,
+  X,
+  Activity,
+  Menu,
+  TrendingDown,
+  Star,
+  Tv,
+  Bell,
+  User,
+  ChevronDown,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { FaviconSearch } from '@/components/ui/FaviconSearch';
-import { UiverseButton } from '@/components/ui/UiverseButton';
+import { FavoritesDrawer } from '@/components/favorites/FavoritesDrawer';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 
-const links = [
-  { href: '/', label: 'Overview' },
-  { href: '/players', label: 'Players Catalog' },
-  { href: '/live', label: 'Live League Feeds' },
-  { href: '/streams', label: 'Live Streams', isStream: true },
-  { href: '/compare', label: 'Comparison Matrix' },
-  { href: '/estimator', label: 'Valuation Engine' },
+const mainPills = [
+  { href: '/', label: 'SCORES' },
+  { href: '/live?tab=news', label: 'NEWS' },
+  { href: '/transfers', label: 'MARKET' },
+  { href: '/estimator', label: 'VALUATION' },
+];
+
+const sportsCategories = [
+  { href: '/', label: 'Football' },
+  { href: '/transfers', label: 'Transfers' },
+  { href: '/estimator', label: 'Estimator' },
+  { href: '/live', label: 'Live Feeds' },
+  { href: '/compare', label: 'Compare' },
+  { href: '/clubs', label: 'Clubs' },
 ];
 
 export function Navbar() {
@@ -21,26 +40,8 @@ export function Navbar() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [now, setNow] = useState('');
-
-  useEffect(() => {
-    const tick = () =>
-      setNow(
-        new Intl.DateTimeFormat('en-GB', {
-          weekday: 'short',
-          day: '2-digit',
-          month: 'short',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-          timeZone: 'UTC',
-        }).format(new Date()) + ' UTC'
-      );
-    tick();
-    const timer = window.setInterval(tick, 30000);
-    return () => window.clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -68,134 +69,173 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-white/[0.08] bg-[#07080c]/85 backdrop-blur-xl transition-all">
-        <div className="mx-auto flex h-[72px] max-w-[1560px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-40 border-b border-[var(--border-color)] bg-[var(--bg-main)] text-[var(--text-main)] transition-colors select-none">
+        
+        {/* Tier 1: Main Header Bar */}
+        <div className="mx-auto flex h-14 max-w-[1507px] items-center justify-between gap-4 px-3 sm:px-6">
           
-          {/* Logo & Branding */}
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex shrink-0 items-center gap-3 group">
-              <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-white/20 bg-gradient-to-br from-emerald-600 to-teal-900 shadow-[0_0_20px_rgba(16,185,129,0.25)] transition-transform group-hover:scale-105">
-                <img src="/logo.png" alt="BALLON" className="h-full w-full object-cover" />
+          {/* Left: Logo with Custom Ball-On Wordmark */}
+          <div className="flex items-center shrink-0 w-44 sm:w-56">
+            <Link href="/" className="flex shrink-0 items-center gap-2.5 group">
+              <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-[8px] border border-[var(--border-color)] bg-[var(--bg-card)] transition-transform group-hover:scale-105 shrink-0">
+                <img src="/logo.png" alt="Ball-On" className="h-full w-full object-cover" />
               </div>
-              <div className="flex items-center gap-2">
-                <span className="display-font text-[22px] tracking-tight font-bold text-white group-hover:text-cyan-300 transition-colors">
-                  BALLON
-                </span>
-                <span className="mono-font rounded-md border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-bold tracking-widest text-amber-400">
-                  PRO
-                </span>
-              </div>
+              <img
+                src="/ball-on-text.png"
+                alt="Ball-On"
+                className="theme-logo-text h-5 sm:h-6 w-auto object-contain transition-transform group-hover:scale-105 shrink-0"
+              />
             </Link>
-
-            {/* Live session pill */}
-            <div className="hidden items-center gap-2.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-3 py-1 lg:flex">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 radar-dot" />
-              <span className="mono-font text-[10px] font-semibold tracking-wider text-slate-400">
-                LIVE / {now || 'SYNCING'}
-              </span>
-            </div>
           </div>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden h-full items-center gap-1 xl:flex">
-            {links.map((link) => {
-              const active = pathname === link.href;
+          {/* Middle: Centered Primary Nav Pills */}
+          <nav className="hidden md:flex items-center justify-center gap-2 flex-1">
+            {mainPills.map((pill) => {
+              const active = pathname === pill.href || (pill.href !== '/' && pathname.startsWith(pill.href));
               return (
                 <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`relative flex h-10 items-center gap-1.5 rounded-lg px-3.5 text-xs font-semibold tracking-wide transition-all ${
+                  key={pill.href}
+                  href={pill.href}
+                  className={`rounded-[32px] px-4 py-1.5 text-xs font-bold transition-all ${
                     active
-                      ? 'bg-white/[0.08] text-white shadow-sm'
-                      : 'text-slate-400 hover:bg-white/[0.04] hover:text-white'
+                      ? 'bg-[var(--text-main)] text-[var(--bg-main)] shadow-sm'
+                      : 'text-[var(--text-muted)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-main)]'
                   }`}
                 >
-                  {link.isStream && (
-                    <span className="flex h-2 w-2 items-center justify-center">
-                      <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-ping" />
-                    </span>
-                  )}
-                  <span>{link.label}</span>
-                  {link.isStream && (
-                    <span className="mono-font rounded border border-rose-500/40 bg-rose-500/20 px-1 py-0.2 text-[8px] font-bold text-rose-300">
-                      LIVE
-                    </span>
-                  )}
-                  {active && (
-                    <span className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-cyan-400 shadow-[0_0_8px_#00f2fe]" />
-                  )}
+                  {pill.label}
                 </Link>
               );
             })}
           </nav>
 
-          {/* Search Bar & Mobile Menu Toggle */}
-          <div className="flex items-center gap-2.5">
-            <UiverseButton
+          {/* Right: Search Input, Theme Toggle & Actions */}
+          <div className="flex items-center justify-end gap-2 shrink-0 w-44 sm:w-56">
+            {/* Search Bar matching Sofa design */}
+            <button
               onClick={() => setOpen(true)}
-              variant="default"
-              size="sm"
-              aria-label="Open command palette"
+              className="flex h-9 items-center gap-2 rounded-[6px] border border-[var(--border-color)] bg-[var(--bg-surface)] px-3 text-xs text-[var(--text-muted)] hover:border-[var(--border-color-hover)] hover:text-[var(--text-main)] transition w-full max-w-[180px]"
             >
-              <Search size={14} className="text-cyan-400" />
-              <span className="hidden sm:inline">Search intelligence…</span>
-              <kbd className="mono-font rounded border border-white/15 bg-black/40 px-1.5 py-0.5 text-[9px] text-slate-300 ml-1">
-                ⌘ K
+              <Search size={14} className="text-[var(--text-muted)]" />
+              <span className="truncate">Search...</span>
+              <kbd className="mono-font ml-auto rounded border border-[var(--border-color)] bg-black/5 dark:bg-white/5 px-1 py-0.2 text-[9px] text-[var(--text-muted)]">
+                Ctrl K
               </kbd>
-            </UiverseButton>
+            </button>
 
-            {/* Mobile Hamburger */}
-            <div className="xl:hidden">
-              <UiverseButton
+            {/* Light / Dark Mode Toggle */}
+            <ThemeToggle />
+
+            {/* Mobile Menu Toggle */}
+            <div className="md:hidden">
+              <button
                 onClick={() => setMobileMenu(!mobileMenu)}
-                variant="default"
-                size="sm"
-                aria-label="Toggle menu"
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-main)]"
               >
                 {mobileMenu ? <X size={18} /> : <Menu size={18} />}
-              </UiverseButton>
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Mobile Dropdown Menu */}
-        {mobileMenu && (
-          <div className="border-b border-white/[0.08] bg-[#07080c]/95 px-4 py-4 backdrop-blur-2xl xl:hidden">
-            <div className="space-y-1">
-              {links.map((link) => {
-                const active = pathname === link.href;
+        {/* Tier 2: Category & Quick Links Strip */}
+        <div className="hidden sm:block border-t border-[var(--border-color)] bg-[var(--bg-surface)] px-3 sm:px-6">
+          <div className="mx-auto flex h-10 max-w-[1507px] items-center justify-between text-xs">
+            
+            {/* Left Spacer for perfect center balance on desktop */}
+            <div className="hidden lg:block w-48 shrink-0" />
+
+            {/* Middle: Centered Category Pills */}
+            <div className="flex items-center justify-center gap-1.5 overflow-x-auto no-scrollbar py-1 flex-1">
+              {sportsCategories.map((cat) => {
+                const active = pathname === cat.href;
                 return (
                   <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setMobileMenu(false)}
-                    className={`flex items-center justify-between rounded-xl px-4 py-2.5 text-sm font-medium transition ${
+                    key={cat.href}
+                    href={cat.href}
+                    className={`flex items-center rounded-[32px] px-3.5 py-1 font-medium transition ${
                       active
-                        ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
-                        : 'text-slate-300 hover:bg-white/[0.05] hover:text-white'
+                        ? 'bg-[var(--text-main)] text-[var(--bg-main)] font-bold'
+                        : 'text-[var(--text-muted)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-main)]'
                     }`}
                   >
-                    <span>{link.label}</span>
-                    {active && <Activity size={14} className="text-cyan-400" />}
+                    <span>{cat.label}</span>
                   </Link>
                 );
               })}
+            </div>
+
+            {/* Right Quick Shortcuts */}
+            <div className="flex items-center justify-end gap-4 text-[11px] font-medium text-[var(--text-muted)] shrink-0 w-auto lg:w-48">
+              <Link href="/estimator" className="hidden xl:flex items-center gap-1 hover:text-[var(--text-main)] transition">
+                <TrendingDown size={12} className="text-[var(--primary)]" />
+                <span>Dropping odds</span>
+              </Link>
+
+              <button
+                onClick={() => setFavoritesOpen(true)}
+                className="flex items-center gap-1 hover:text-[var(--text-main)] transition"
+              >
+                <Star size={12} className="text-[#ffd600]" />
+                <span>Favourites</span>
+              </button>
+
+              <Link href="/streams" className="flex items-center gap-1 hover:text-[var(--text-main)] transition">
+                <Tv size={12} className="text-[#E73B3B]" />
+                <span>TV schedule</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Navigation Drawer */}
+        {mobileMenu && (
+          <div className="border-t border-[var(--border-color)] bg-[var(--bg-surface)] px-4 py-4 md:hidden">
+            <div className="space-y-1">
+              {mainPills.map((pill) => (
+                <Link
+                  key={pill.href}
+                  href={pill.href}
+                  onClick={() => setMobileMenu(false)}
+                  className="flex items-center justify-between rounded-xl px-4 py-2.5 text-sm font-semibold text-[var(--text-main)] hover:bg-[var(--bg-card-hover)]"
+                >
+                  <span>{pill.label}</span>
+                </Link>
+              ))}
+              <div className="pt-2 mt-2 border-t border-[var(--border-color)] flex items-center justify-between">
+                <span className="text-xs text-[var(--text-muted)]">Favorites</span>
+                <button
+                  onClick={() => {
+                    setMobileMenu(false);
+                    setFavoritesOpen(true);
+                  }}
+                  className="flex items-center gap-1 text-xs text-[#ffd600] font-bold"
+                >
+                  <Star size={14} className="fill-[#ffd600]" />
+                  <span>Open</span>
+                </button>
+              </div>
             </div>
           </div>
         )}
       </header>
 
+      {/* Favorites Drawer Component */}
+      <FavoritesDrawer
+        isOpen={favoritesOpen}
+        onClose={() => setFavoritesOpen(false)}
+      />
+
       {/* ⌘K Command Palette Modal */}
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 p-4 pt-[12vh] backdrop-blur-md"
+          className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 p-4 pt-[12vh] backdrop-blur-md"
           onMouseDown={() => setOpen(false)}
         >
           <div
-            className="w-full max-w-xl overflow-hidden rounded-2xl border border-white/20 bg-[#0e121a]/95 shadow-[0_25px_70px_rgba(0,0,0,0.8)] backdrop-blur-2xl"
+            className="w-full max-w-xl overflow-hidden rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-main)] shadow-2xl backdrop-blur-2xl"
             onMouseDown={(e) => e.stopPropagation()}
           >
-            <div className="border-b border-white/[0.08] p-3">
+            <div className="border-b border-[var(--border-color)] p-3">
               <form onSubmit={submit}>
                 <FaviconSearch
                   autoFocus
@@ -209,30 +249,9 @@ export function Navbar() {
                   placeholder="Search players, clubs, or valuations (e.g. Haaland, Real Madrid)…"
                   clearable={true}
                   className="w-full"
-                  inputClassName="py-3 pl-[48px] text-sm rounded-xl bg-black/40 border-white/10 focus:border-cyan-400"
+                  inputClassName="py-3 pl-[48px] text-sm rounded-xl bg-[var(--bg-surface)] border-[var(--border-color)] text-[var(--text-main)] focus:border-[var(--primary)]"
                 />
               </form>
-            </div>
-
-            <div className="p-3">
-              <p className="editorial-kicker px-3 py-2 text-slate-400 font-semibold">
-                Quick Navigation
-              </p>
-              <div className="space-y-1">
-                {links.map((link) => (
-                  <button
-                    key={link.href}
-                    onClick={() => {
-                      router.push(link.href);
-                      setOpen(false);
-                    }}
-                    className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm text-slate-300 transition hover:bg-white/[0.06] hover:text-white"
-                  >
-                    <span className="font-medium">{link.label}</span>
-                    <Activity size={14} className="text-cyan-400" />
-                  </button>
-                ))}
-              </div>
             </div>
           </div>
         </div>

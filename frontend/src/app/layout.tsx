@@ -3,6 +3,9 @@ import { Outfit, Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Navbar } from '@/components/layout/Navbar';
 import { PageContainer } from '@/components/layout/PageContainer';
+import { ThemeProvider } from '@/context/ThemeContext';
+import { BottomNav } from '@/components/layout/BottomNav';
+import { TopScoresTicker } from '@/components/layout/TopScoresTicker';
 
 const sansFont = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -41,23 +44,48 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-theme="dark"
       className={`dark ${sansFont.variable} ${displayFont.variable} ${monoFont.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const stored = localStorage.getItem('ballon-theme');
+                if (stored === 'light') {
+                  document.documentElement.setAttribute('data-theme', 'light');
+                  document.documentElement.classList.remove('dark');
+                } else {
+                  document.documentElement.setAttribute('data-theme', 'dark');
+                  document.documentElement.classList.add('dark');
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
+      </head>
       <body
-        className="antialiased min-h-screen bg-[#07080c] text-[#f1f5f9] font-sans overflow-x-hidden selection:bg-cyan-500/20 selection:text-cyan-200"
+        className="antialiased min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] font-sans overflow-x-hidden selection:bg-amber-500/20 selection:text-amber-200 transition-colors duration-300"
         suppressHydrationWarning
       >
         {/* Ambient atmospheric glow elements */}
-        <div className="fixed top-0 left-1/4 w-[600px] h-[350px] bg-cyan-500/5 blur-[140px] pointer-events-none rounded-full" />
-        <div className="fixed top-1/3 right-10 w-[500px] h-[400px] bg-emerald-500/5 blur-[160px] pointer-events-none rounded-full" />
-        <div className="fixed bottom-10 left-10 w-[450px] h-[350px] bg-amber-500/3 blur-[140px] pointer-events-none rounded-full" />
+        <div className="fixed top-0 left-1/4 w-[600px] h-[350px] bg-[var(--glow-1)] blur-[140px] pointer-events-none rounded-full transition-colors duration-500" />
+        <div className="fixed top-1/3 right-10 w-[500px] h-[400px] bg-[var(--glow-2)] blur-[160px] pointer-events-none rounded-full transition-colors duration-500" />
+        <div className="fixed bottom-10 left-10 w-[450px] h-[350px] bg-[var(--glow-3)] blur-[140px] pointer-events-none rounded-full transition-colors duration-500" />
 
-        <Navbar />
-        <main className="relative z-10">
-          <PageContainer>{children}</PageContainer>
-        </main>
+        <ThemeProvider>
+          <TopScoresTicker />
+          <Navbar />
+          <main className="relative z-10 pb-20 sm:pb-24">
+            <PageContainer>{children}</PageContainer>
+          </main>
+          <BottomNav />
+        </ThemeProvider>
       </body>
     </html>
   );
 }
+
+

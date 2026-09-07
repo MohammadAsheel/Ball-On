@@ -512,11 +512,11 @@ export interface BigBallsLinescore {
 
 export interface BigBallsMatch {
   id: string;
-  sport: string;
+  sport?: string;
   league: string;
   home: BigBallsTeam;
   away: BigBallsTeam;
-  kickoff_utc: string;
+  kickoff_utc?: string;
   status: 'scheduled' | 'live' | 'finished' | 'postponed' | 'cancelled' | string;
   score?: BigBallsScore;
   linescore?: BigBallsLinescore;

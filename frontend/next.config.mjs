@@ -6,6 +6,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  devIndicators: false,
+  experimental: {
+    devtoolSegmentExplorer: false,
+  },
   transpilePackages: ['recharts', 'lucide-react'],
   images: {
     remotePatterns: [
@@ -19,6 +23,13 @@ const nextConfig = {
   turbopack: {
     root: __dirname,
   },
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.cache = false;
+    }
+    return config;
+  },
 };
 
 export default nextConfig;
+// Config reloaded

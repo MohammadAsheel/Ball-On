@@ -452,6 +452,18 @@ export const api = {
 
     if (params?.date) q.append('date', params.date);
 
+    // If running in browser, query local Next.js route first for instant response
+    if (typeof window !== 'undefined') {
+      try {
+        const res = await fetch(`/api/matches?${q.toString()}`, {
+          cache: 'no-store',
+        });
+        if (res.ok) {
+          return (await res.json()) as BigBallsMatchesResponse;
+        }
+      } catch (_) {}
+    }
+
     try {
       return await fetchJSON<BigBallsMatchesResponse>(
         `/api/live/bigballs/matches?${q.toString()}`

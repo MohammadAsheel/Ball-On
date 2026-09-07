@@ -43,7 +43,14 @@ async function fetchLeagueMatches(
     }
 
     const json = await res.json();
-    return (json.data || []).map((m: any) => ({
+    const rawMatches = Array.isArray(json.data)
+      ? json.data
+      : Array.isArray(json)
+      ? json
+      : Array.isArray(json?.matches)
+      ? json.matches
+      : [];
+    return rawMatches.map((m: any) => ({
       ...m,
       league: m?.league || league.toUpperCase(),
     }));

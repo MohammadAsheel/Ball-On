@@ -38,7 +38,7 @@ export function Navbar() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-lg font-black tracking-tight text-white">BALLON</span>
+              <img src="/ball-on-text.png" alt="Ball-On" className="h-6 w-auto object-contain invert" />
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
                 PRO
               </span>
