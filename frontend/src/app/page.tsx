@@ -23,55 +23,98 @@ import {
   Zap,
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { OverviewData, PlayerSearchItem, BigBallsMatch } from '@/lib/types';
+import { OverviewData, PlayerSearchItem, BigBallsMatch, FeaturedShowcaseMatch } from '@/lib/types';
 import { formatEUR } from '@/lib/format';
 import { FaviconSearch } from '@/components/ui/FaviconSearch';
 import { LaLigaStreamModal } from '@/components/live/LaLigaStreamModal';
 import { useFavorites } from '@/components/favorites/FavoritesDrawer';
 
-// Featured Matches for the center showcase carousel
-const FEATURED_SHOWCASE = [
+// High-fidelity fallback matches prioritized by Premier League -> Champions League -> La Liga -> Bundesliga -> Serie A -> Ligue 1
+const FALLBACK_SHOWCASE: FeaturedShowcaseMatch[] = [
   {
     id: 101,
+    leagueId: 47,
     league: 'Premier League',
     leagueIcon: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-    home: { name: 'Ipswich Town', short: 'IPS', logo: 'https://media.api-sports.io/football/teams/64.png' },
-    away: { name: 'Liverpool', short: 'LIV', logo: 'https://media.api-sports.io/football/teams/40.png' },
-    dateDisplay: '05/09/2026',
-    timeDisplay: 'Sat 00:30',
-    odds: [
-      { bookmaker: '1XBET', home: '5.50', draw: '4.75', away: '1.50', trend: 'up' },
-      { bookmaker: 'Stake', home: '5.45', draw: '4.70', away: '1.50', trend: 'down' },
-    ],
-    initialVotes: { home: 18, draw: 22, away: 60 },
+    priorityRank: 1,
+    isLive: false,
+    status: 'scheduled',
+    home: { name: 'Bournemouth', short: 'BOU', logo: 'https://images.fotmob.com/image_resources/logo/teamlogo/8678.png' },
+    away: { name: 'Brentford', short: 'BRE', logo: 'https://images.fotmob.com/image_resources/logo/teamlogo/9937.png' },
+    dateDisplay: '12/09/2026',
+    timeDisplay: 'Sat 15:00',
+    initialVotes: { home: 44, draw: 26, away: 30 },
   },
   {
     id: 102,
-    league: 'La Liga',
-    leagueIcon: '🇪🇸',
-    home: { name: 'Real Madrid', short: 'RMA', logo: 'https://media.api-sports.io/football/teams/541.png' },
-    away: { name: 'Barcelona', short: 'BAR', logo: 'https://media.api-sports.io/football/teams/529.png' },
-    dateDisplay: '06/09/2026',
-    timeDisplay: 'Sun 20:00',
-    odds: [
-      { bookmaker: '1XBET', home: '2.10', draw: '3.60', away: '3.10', trend: 'up' },
-      { bookmaker: 'Stake', home: '2.15', draw: '3.55', away: '3.05', trend: 'up' },
-    ],
-    initialVotes: { home: 52, draw: 18, away: 30 },
+    leagueId: 42,
+    league: 'Champions League',
+    leagueIcon: '🇪🇺',
+    priorityRank: 2,
+    isLive: false,
+    status: 'scheduled',
+    home: { name: 'Arsenal', short: 'ARS', logo: 'https://images.fotmob.com/image_resources/logo/teamlogo/9825.png' },
+    away: { name: 'Bayern Munich', short: 'BAY', logo: 'https://images.fotmob.com/image_resources/logo/teamlogo/9823.png' },
+    dateDisplay: '16/09/2026',
+    timeDisplay: 'Wed 20:00',
+    initialVotes: { home: 48, draw: 22, away: 30 },
   },
   {
     id: 103,
-    league: 'Champions League',
-    leagueIcon: '🇪🇺',
-    home: { name: 'Arsenal', short: 'ARS', logo: 'https://media.api-sports.io/football/teams/42.png' },
-    away: { name: 'Bayern Munich', short: 'BAY', logo: 'https://media.api-sports.io/football/teams/157.png' },
-    dateDisplay: '08/09/2026',
-    timeDisplay: 'Tue 20:00',
-    odds: [
-      { bookmaker: '1XBET', home: '2.30', draw: '3.40', away: '2.90', trend: 'down' },
-      { bookmaker: 'Stake', home: '2.25', draw: '3.45', away: '2.95', trend: 'down' },
-    ],
-    initialVotes: { home: 44, draw: 24, away: 32 },
+    leagueId: 87,
+    league: 'La Liga',
+    leagueIcon: '🇪🇸',
+    priorityRank: 3,
+    isLive: false,
+    status: 'scheduled',
+    home: { name: 'Elche', short: 'ELC', logo: 'https://images.fotmob.com/image_resources/logo/teamlogo/10268.png' },
+    away: { name: 'Real Sociedad', short: 'RSO', logo: 'https://images.fotmob.com/image_resources/logo/teamlogo/8910.png' },
+    dateDisplay: 'Today',
+    timeDisplay: '21:00',
+    initialVotes: { home: 22, draw: 28, away: 50 },
+  },
+  {
+    id: 104,
+    leagueId: 54,
+    league: 'Bundesliga',
+    leagueIcon: '🇩🇪',
+    priorityRank: 4,
+    isLive: false,
+    status: 'scheduled',
+    home: { name: 'Union Berlin', short: 'FCU', logo: 'https://images.fotmob.com/image_resources/logo/teamlogo/8535.png' },
+    away: { name: 'Schalke 04', short: 'S04', logo: 'https://images.fotmob.com/image_resources/logo/teamlogo/9857.png' },
+    dateDisplay: '11/09/2026',
+    timeDisplay: 'Fri 20:30',
+    initialVotes: { home: 52, draw: 24, away: 24 },
+  },
+  {
+    id: 105,
+    leagueId: 55,
+    league: 'Serie A',
+    leagueIcon: '🇮🇹',
+    priorityRank: 5,
+    isLive: true,
+    status: 'live',
+    liveMinute: '42’',
+    home: { name: 'Udinese', short: 'UDI', logo: 'https://images.fotmob.com/image_resources/logo/teamlogo/8600.png', score: 0 },
+    away: { name: 'Lazio', short: 'LAZ', logo: 'https://images.fotmob.com/image_resources/logo/teamlogo/8543.png', score: 0 },
+    dateDisplay: 'Today',
+    timeDisplay: '20:45',
+    initialVotes: { home: 34, draw: 32, away: 34 },
+  },
+  {
+    id: 106,
+    leagueId: 53,
+    league: 'Ligue 1',
+    leagueIcon: '🇫🇷',
+    priorityRank: 6,
+    isLive: false,
+    status: 'scheduled',
+    home: { name: 'Rennes', short: 'REN', logo: 'https://images.fotmob.com/image_resources/logo/teamlogo/9847.png' },
+    away: { name: 'Marseille', short: 'OM', logo: 'https://images.fotmob.com/image_resources/logo/teamlogo/8121.png' },
+    dateDisplay: '11/09/2026',
+    timeDisplay: 'Fri 21:00',
+    initialVotes: { home: 36, draw: 28, away: 36 },
   },
 ];
 
@@ -87,8 +130,14 @@ export default function OverviewPage() {
   const [showOdds, setShowOdds] = useState(true);
 
   // Center column showcase states
+  const [showcaseMatches, setShowcaseMatches] = useState<FeaturedShowcaseMatch[]>(FALLBACK_SHOWCASE);
+  const [showcaseLoading, setShowcaseLoading] = useState(true);
   const [showcaseIndex, setShowcaseIndex] = useState(0);
-  const [userVote, setUserVote] = useState<'home' | 'draw' | 'away' | null>(null);
+  const [userVotes, setUserVotes] = useState<Record<string | number, 'home' | 'draw' | 'away'>>({});
+
+  const castVote = (matchId: string | number, choice: 'home' | 'draw' | 'away') => {
+    setUserVotes((prev) => ({ ...prev, [matchId]: choice }));
+  };
 
   // AI valuation scenario tuner
   const [age, setAge] = useState(24);
@@ -116,6 +165,16 @@ export default function OverviewPage() {
   };
 
   useEffect(() => {
+    // Load live prioritized showcase for center hero card
+    api.getFeaturedShowcase(8)
+      .then((res) => {
+        if (res?.matches && res.matches.length > 0) {
+          setShowcaseMatches(res.matches);
+        }
+      })
+      .catch(() => null)
+      .finally(() => setShowcaseLoading(false));
+
     Promise.all([
       api.getOverview().catch(() => null),
       api.getPlayersDirectory({ page_size: 10 }).catch(() => null),
@@ -194,7 +253,7 @@ export default function OverviewPage() {
     return matches.filter((m) => m.status === 'live' || m.status === 'in_progress').length;
   }, [matches]);
 
-  const currentShowcase = FEATURED_SHOWCASE[showcaseIndex];
+  const currentShowcase = showcaseMatches[showcaseIndex] || showcaseMatches[0] || FALLBACK_SHOWCASE[0];
 
   return (
     <div className="space-y-4 pb-12">
@@ -403,155 +462,213 @@ export default function OverviewPage() {
         <div className="space-y-4">
           
           {/* Featured Match Hero Card */}
-          <div className="sofa-card p-5">
-            
-            {/* Header: Competition & Navigation */}
-            <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-3 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="text-sm">{currentShowcase.leagueIcon}</span>
-                <span className="font-bold text-[var(--text-main)]">{currentShowcase.league}</span>
-              </div>
+          {(() => {
+            const currentShowcase = showcaseMatches[showcaseIndex] || showcaseMatches[0] || FALLBACK_SHOWCASE[0];
+            const currentVote = userVotes[currentShowcase.id] || null;
+            const baseVotes = currentShowcase.initialVotes || { home: 45, draw: 25, away: 30 };
+            const effectiveVotes = !currentVote
+              ? baseVotes
+              : currentVote === 'home'
+              ? { home: Math.min(92, baseVotes.home + 6), draw: Math.max(4, baseVotes.draw - 3), away: Math.max(4, baseVotes.away - 3) }
+              : currentVote === 'draw'
+              ? { home: Math.max(4, baseVotes.home - 3), draw: Math.min(88, baseVotes.draw + 6), away: Math.max(4, baseVotes.away - 3) }
+              : { home: Math.max(4, baseVotes.home - 3), draw: Math.max(4, baseVotes.draw - 3), away: Math.min(92, baseVotes.away + 6) };
 
-              {/* Carousel Next / Prev */}
-              <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-                <button
-                  onClick={() => setShowcaseIndex((prev) => (prev > 0 ? prev - 1 : FEATURED_SHOWCASE.length - 1))}
-                  className="p-1 hover:text-[var(--text-main)] transition"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <div className="flex items-center gap-1">
-                  {FEATURED_SHOWCASE.map((_, i) => (
-                    <span
-                      key={i}
-                      className={`h-1.5 rounded-full transition-all ${
-                        showcaseIndex === i ? 'w-4 bg-[var(--primary)]' : 'w-1.5 bg-black/15 dark:bg-white/20'
-                      }`}
+            return (
+              <div className="sofa-card p-5 transition-all">
+                {/* Header: Competition & Navigation */}
+                <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-3 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">{currentShowcase.leagueIcon}</span>
+                    <span className="font-bold text-[var(--text-main)]">{currentShowcase.league}</span>
+                    {currentShowcase.isLive ? (
+                      <span className="flex items-center gap-1.5 bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
+                        <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                        LIVE {currentShowcase.liveMinute ? currentShowcase.liveMinute : ''}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-semibold text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded-full bg-cyan-500/10">
+                        UPCOMING
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Carousel Next / Prev */}
+                  <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+                    <button
+                      onClick={() => setShowcaseIndex((prev) => (prev > 0 ? prev - 1 : showcaseMatches.length - 1))}
+                      className="p-1 hover:text-[var(--text-main)] transition"
+                      title="Previous match"
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                    <div className="flex items-center gap-1">
+                      {showcaseMatches.map((m, i) => (
+                        <button
+                          key={m.id || i}
+                          onClick={() => setShowcaseIndex(i)}
+                          className={`h-1.5 rounded-full transition-all ${
+                            showcaseIndex === i ? 'w-4 bg-[var(--primary)]' : 'w-1.5 bg-black/15 dark:bg-white/20'
+                          }`}
+                          title={`${m.league}: ${m.home.name} vs ${m.away.name}`}
+                        />
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => setShowcaseIndex((prev) => (prev < showcaseMatches.length - 1 ? prev + 1 : 0))}
+                      className="p-1 hover:text-[var(--text-main)] transition"
+                      title="Next match"
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Matchup Crests & Time / Score */}
+                <div className="py-6 flex items-center justify-between text-center px-2 sm:px-4">
+                  {/* Home Team */}
+                  <div className="flex flex-col items-center flex-1 min-w-0">
+                    <img
+                      src={currentShowcase.home.logo}
+                      alt={currentShowcase.home.name}
+                      className="h-14 w-14 object-contain mb-2 drop-shadow-md"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
                     />
-                  ))}
+                    <h3 className="font-bold text-sm text-[var(--text-main)] truncate max-w-[130px]">
+                      {currentShowcase.home.name}
+                    </h3>
+                  </div>
+
+                  {/* Center: Live Score or Kickoff Date & Time */}
+                  {currentShowcase.isLive ? (
+                    <div className="flex flex-col items-center px-4 shrink-0">
+                      <div className="score-numeral text-2xl sm:text-3xl font-extrabold text-[var(--text-main)] tracking-tight">
+                        {currentShowcase.home.score ?? 0} : {currentShowcase.away.score ?? 0}
+                      </div>
+                      <span className="timer-display text-xs text-red-400 font-bold mt-1 flex items-center gap-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+                        {currentShowcase.liveMinute || 'LIVE IN-PLAY'}
+                      </span>
+                      <button
+                        onClick={() => {
+                          handleOpenStream({
+                            title: `${currentShowcase.home.name} vs ${currentShowcase.away.name}`,
+                            home: currentShowcase.home.name,
+                            away: currentShowcase.away.name,
+                            score: `${currentShowcase.home.score ?? 0} - ${currentShowcase.away.score ?? 0}`,
+                          });
+                        }}
+                        className="mt-2.5 sofa-pill bg-red-500/15 text-red-400 border border-red-500/30 text-[11px] py-1 px-3 hover:bg-red-500 hover:text-white transition font-semibold"
+                      >
+                        <Tv size={11} /> Watch Live
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center px-4 shrink-0">
+                      <span className="score-numeral text-xl font-extrabold text-[var(--text-main)] tracking-tight">
+                        {currentShowcase.dateDisplay}
+                      </span>
+                      <span className="timer-display text-xs text-[var(--text-muted)] mt-1 font-semibold">
+                        {currentShowcase.timeDisplay}
+                      </span>
+                      <button
+                        onClick={() => {
+                          handleOpenStream({
+                            title: `${currentShowcase.home.name} vs ${currentShowcase.away.name}`,
+                            home: currentShowcase.home.name,
+                            away: currentShowcase.away.name,
+                            score: 'Upcoming',
+                          });
+                        }}
+                        className="mt-2.5 sofa-pill bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/30 text-[11px] py-1 px-3 hover:bg-[var(--primary)] hover:text-white transition"
+                      >
+                        <Tv size={11} /> Watch Stream
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Away Team */}
+                  <div className="flex flex-col items-center flex-1 min-w-0">
+                    <img
+                      src={currentShowcase.away.logo}
+                      alt={currentShowcase.away.name}
+                      className="h-14 w-14 object-contain mb-2 drop-shadow-md"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                    <h3 className="font-bold text-sm text-[var(--text-main)] truncate max-w-[130px]">
+                      {currentShowcase.away.name}
+                    </h3>
+                  </div>
                 </div>
-                <button
-                  onClick={() => setShowcaseIndex((prev) => (prev < FEATURED_SHOWCASE.length - 1 ? prev + 1 : 0))}
-                  className="p-1 hover:text-[var(--text-main)] transition"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            </div>
 
-            {/* Matchup Crests & Time */}
-            <div className="py-6 flex items-center justify-between text-center px-4">
-              {/* Home Team */}
-              <div className="flex flex-col items-center flex-1 min-w-0">
-                <img
-                  src={currentShowcase.home.logo}
-                  alt={currentShowcase.home.name}
-                  className="h-14 w-14 object-contain mb-2 drop-shadow-md"
-                  onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
-                />
-                <h3 className="font-bold text-sm text-[var(--text-main)] truncate max-w-[130px]">
-                  {currentShowcase.home.name}
-                </h3>
-              </div>
+                {/* Interactive "Who will win? Cast your vote!" Widget */}
+                <div className="border-t border-[var(--border-color)] pt-4 mt-2">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h4 className="text-xs font-bold text-[var(--text-main)]">Who will win?</h4>
+                      <p className="text-[11px] text-[var(--text-muted)]">
+                        {currentVote ? 'Your vote is recorded!' : 'Cast your vote!'}
+                      </p>
+                    </div>
+                    <Trophy size={16} className="text-[var(--primary)]" />
+                  </div>
 
-              {/* Kickoff Date & Time */}
-              <div className="flex flex-col items-center px-4 shrink-0">
-                <span className="score-numeral text-xl font-extrabold text-[var(--text-main)] tracking-tight">
-                  {currentShowcase.dateDisplay}
-                </span>
-                <span className="timer-display text-xs text-[var(--text-muted)] mt-1 font-semibold">
-                  {currentShowcase.timeDisplay}
-                </span>
-                <button
-                  onClick={() => {
-                    handleOpenStream({
-                      title: `${currentShowcase.home.name} vs ${currentShowcase.away.name}`,
-                      home: currentShowcase.home.name,
-                      away: currentShowcase.away.name,
-                      score: '0 - 0',
-                    });
-                  }}
-                  className="mt-2.5 sofa-pill bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/30 text-[11px] py-1 px-3 hover:bg-[var(--primary)] hover:text-white transition"
-                >
-                  <Tv size={11} /> Watch Stream
-                </button>
-              </div>
+                  {/* 3 Vote Buttons */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      onClick={() => castVote(currentShowcase.id, 'home')}
+                      className={`sofa-vote-btn ${currentVote === 'home' ? 'active' : ''}`}
+                    >
+                      <img src={currentShowcase.home.logo} alt="" className="h-4 w-4 object-contain" />
+                      <span>1 ({currentShowcase.home.short})</span>
+                    </button>
 
-              {/* Away Team */}
-              <div className="flex flex-col items-center flex-1 min-w-0">
-                <img
-                  src={currentShowcase.away.logo}
-                  alt={currentShowcase.away.name}
-                  className="h-14 w-14 object-contain mb-2 drop-shadow-md"
-                  onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
-                />
-                <h3 className="font-bold text-sm text-[var(--text-main)] truncate max-w-[130px]">
-                  {currentShowcase.away.name}
-                </h3>
-              </div>
-            </div>
+                    <button
+                      onClick={() => castVote(currentShowcase.id, 'draw')}
+                      className={`sofa-vote-btn ${currentVote === 'draw' ? 'active' : ''}`}
+                    >
+                      <span>X (Draw)</span>
+                    </button>
 
-            {/* Interactive "Who will win? Cast your vote!" Widget */}
-            <div className="border-t border-[var(--border-color)] pt-4 mt-2">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h4 className="text-xs font-bold text-[var(--text-main)]">Who will win?</h4>
-                  <p className="text-[11px] text-[var(--text-muted)]">Cast your vote!</p>
-                </div>
-                <Trophy size={16} className="text-[var(--primary)]" />
-              </div>
+                    <button
+                      onClick={() => castVote(currentShowcase.id, 'away')}
+                      className={`sofa-vote-btn ${currentVote === 'away' ? 'active' : ''}`}
+                    >
+                      <img src={currentShowcase.away.logo} alt="" className="h-4 w-4 object-contain" />
+                      <span>2 ({currentShowcase.away.short})</span>
+                    </button>
+                  </div>
 
-              {/* 3 Vote Buttons */}
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => setUserVote('home')}
-                  className={`sofa-vote-btn ${userVote === 'home' ? 'active' : ''}`}
-                >
-                  <img src={currentShowcase.home.logo} alt="" className="h-4 w-4 object-contain" />
-                  <span>1 ({currentShowcase.home.short})</span>
-                </button>
-
-                <button
-                  onClick={() => setUserVote('draw')}
-                  className={`sofa-vote-btn ${userVote === 'draw' ? 'active' : ''}`}
-                >
-                  <span>X (Draw)</span>
-                </button>
-
-                <button
-                  onClick={() => setUserVote('away')}
-                  className={`sofa-vote-btn ${userVote === 'away' ? 'active' : ''}`}
-                >
-                  <img src={currentShowcase.away.logo} alt="" className="h-4 w-4 object-contain" />
-                  <span>2 ({currentShowcase.away.short})</span>
-                </button>
-              </div>
-
-              {/* Vote Distribution Bar (shown after vote or always) */}
-              <div className="mt-3 space-y-1">
-                <div className="h-2 w-full rounded-full bg-black/10 dark:bg-white/10 overflow-hidden flex">
-                  <div
-                    style={{ width: `${currentShowcase.initialVotes.home}%` }}
-                    className="h-full bg-[var(--primary)] transition-all duration-500"
-                  />
-                  <div
-                    style={{ width: `${currentShowcase.initialVotes.draw}%` }}
-                    className="h-full bg-black/20 dark:bg-white/30 transition-all duration-500"
-                  />
-                  <div
-                    style={{ width: `${currentShowcase.initialVotes.away}%` }}
-                    className="h-full bg-[#E73B3B] transition-all duration-500"
-                  />
-                </div>
-                <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)] font-mono px-0.5">
-                  <span>{currentShowcase.initialVotes.home}%</span>
-                  <span>{currentShowcase.initialVotes.draw}%</span>
-                  <span>{currentShowcase.initialVotes.away}%</span>
+                  {/* Vote Distribution Bar */}
+                  <div className="mt-3 space-y-1">
+                    <div className="h-2 w-full rounded-full bg-black/10 dark:bg-white/10 overflow-hidden flex">
+                      <div
+                        style={{ width: `${effectiveVotes.home}%` }}
+                        className="h-full bg-[var(--primary)] transition-all duration-500"
+                      />
+                      <div
+                        style={{ width: `${effectiveVotes.draw}%` }}
+                        className="h-full bg-black/20 dark:bg-white/30 transition-all duration-500"
+                      />
+                      <div
+                        style={{ width: `${effectiveVotes.away}%` }}
+                        className="h-full bg-[#E73B3B] transition-all duration-500"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)] font-mono px-0.5">
+                      <span>{effectiveVotes.home}%</span>
+                      <span>{effectiveVotes.draw}%</span>
+                      <span>{effectiveVotes.away}%</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-
-          </div>
+            );
+          })()}
 
           {/* Highlighted Transfers & Market Movers Card */}
           <div className="sofa-card p-5">
