@@ -19,6 +19,19 @@ import {
   ApiFootballAssistsResponse,
   LiveApiStatusResponse,
   FootballNewsResponse,
+  LiveFootballPopularLeague,
+  LiveFootballCountry,
+  LiveFootballLeague,
+  LiveFootballMatch,
+  LiveFootballStanding,
+  LiveFootballPlayerLeader,
+  LiveFootballTransfer,
+  LiveFootballTransfersResponse,
+  LiveFootballNewsItem,
+  LiveFootballSearchResultItem,
+  FeaturedShowcaseMatch,
+  FeaturedShowcaseResponse,
+  BallonApiResponse,
 } from './types';
 
 export const API_BASE_URL = (
@@ -429,6 +442,17 @@ export const api = {
       `/api/players/live-transfermarkt/search?q=${encodeURIComponent(query)}&refresh=${refresh}`
     ),
 
+  // Featured Showcase for Dashboard Carousel
+  getFeaturedShowcase: async (limit = 8): Promise<FeaturedShowcaseResponse> => {
+    try {
+      return await fetchJSON<FeaturedShowcaseResponse>(
+        `/api/live/featured-showcase?limit=${limit}`
+      );
+    } catch (_) {
+      return { count: 0, live_count: 0, matches: [] };
+    }
+  },
+
   // BigBallsData SDK Match Intelligence
   getBigBallsMatches: async (params?: {
     league?: string;
@@ -570,4 +594,325 @@ export const api = {
       `/api/news/injuries?${q.toString()}`
     );
   },
-};
+
+  // Verified Live Transfers Feed
+  getLiveTransfers: (params?: {
+    type?: 'top' | 'market_value' | 'all';
+    page?: number;
+  }) => {
+    const q = new URLSearchParams();
+    if (params?.type) q.append('type', params.type);
+    if (params?.page) q.append('page', String(params.page));
+    return fetchJSON<LiveFootballTransfersResponse>(
+      `/api/transfers/live?${q.toString()}`
+    );
+  },
+
+  // ──────────────────────────────────────────────
+  // Live Football Data RapidAPI Services
+  // ──────────────────────────────────────────────
+  football: {
+    // Leagues
+    getPopularLeagues: () =>
+      fetchJSON<{ count: number; popular: LiveFootballPopularLeague[] }>(
+        '/api/football/leagues/popular'
+      ),
+
+    getCountries: () =>
+      fetchJSON<{ count: number; countries: LiveFootballCountry[] }>(
+        '/api/football/countries'
+      ),
+
+    getAllLeagues: () =>
+      fetchJSON<{ count: number; leagues: LiveFootballLeague[] }>(
+        '/api/football/leagues/all'
+      ),
+
+    getLeaguesWithCountries: () =>
+      fetchJSON<{ count: number; data: any[] }>(
+        '/api/football/leagues/with-countries'
+      ),
+
+    getLeagueDetail: (leagueId: number) =>
+      fetchJSON<{ league_id: number; detail: any }>(
+        `/api/football/leagues/${leagueId}`
+      ),
+
+    getLeagueLogo: (leagueId: number) =>
+      fetchJSON<{ league_id: number; logo: any }>(
+        `/api/football/leagues/${leagueId}/logo`
+      ),
+
+    getSeasons: () =>
+      fetchJSON<{ count: number; seasons: any[] }>(
+        '/api/football/seasons'
+      ),
+
+    getLeagueRounds: (leagueId: number) =>
+      fetchJSON<{ league_id: number; count: number; rounds: any[] }>(
+        `/api/football/leagues/${leagueId}/rounds`
+      ),
+
+    getRoundDetail: (roundId: number) =>
+      fetchJSON<{ round_id: number; detail: any }>(
+        `/api/football/rounds/${roundId}`
+      ),
+
+    getLeagueRoundsPlayers: (leagueId: number) =>
+      fetchJSON<{ league_id: number; data: any }>(
+        `/api/football/leagues/${leagueId}/rounds-players`
+      ),
+
+    getLeagueTrophies: (leagueId: number) =>
+      fetchJSON<{ league_id: number; count: number; trophies: any[] }>(
+        `/api/football/leagues/${leagueId}/trophies`
+      ),
+
+    getLeagueTrophiesDetail: (leagueId: number, season = '2023/2024') =>
+      fetchJSON<{ league_id: number; season: string; detail: any }>(
+        `/api/football/leagues/${leagueId}/trophies/detail?season=${encodeURIComponent(season)}`
+      ),
+
+    // Teams
+    getTeams: (leagueId: number, type: 'all' | 'home' | 'away' = 'all') =>
+      fetchJSON<{ league_id: number; type: string; count: number; teams: any[] }>(
+        `/api/football/leagues/${leagueId}/teams?type=${type}`
+      ),
+
+    getTeamDetail: (teamId: number) =>
+      fetchJSON<{ team_id: number; team: any }>(
+        `/api/football/teams/${teamId}`
+      ),
+
+    getTeamLogo: (teamId: number) =>
+      fetchJSON<{ team_id: number; logo: any }>(
+        `/api/football/teams/${teamId}/logo`
+      ),
+
+    getTeamPlayers: (teamId: number) =>
+      fetchJSON<{ team_id: number; count: number; players: any[] }>(
+        `/api/football/teams/${teamId}/players`
+      ),
+
+    // Players
+    getPlayerDetail: (playerId: number) =>
+      fetchJSON<{ player_id: number; detail: any }>(
+        `/api/football/players/${playerId}`
+      ),
+
+    getPlayerLogo: (playerId: number) =>
+      fetchJSON<{ player_id: number; logo: any }>(
+        `/api/football/players/${playerId}/logo`
+      ),
+
+    // Matches & Live
+    getLiveMatches: () =>
+      fetchJSON<{ count: number; live: LiveFootballMatch[] }>(
+        '/api/football/matches/live'
+      ),
+
+    getMatchesByDate: (date: string, leagueId?: number) => {
+      const q = new URLSearchParams({ date });
+      if (leagueId !== undefined) q.append('league_id', String(leagueId));
+      return fetchJSON<{
+        date: string;
+        league_id?: number;
+        count: number;
+        matches: LiveFootballMatch[];
+      }>(`/api/football/matches/by-date?${q.toString()}`);
+    },
+
+    getLeagueMatches: (leagueId: number) =>
+      fetchJSON<{ league_id: number; count: number; matches: LiveFootballMatch[] }>(
+        `/api/football/leagues/${leagueId}/matches`
+      ),
+
+    getMatchDetail: (eventId: number) =>
+      fetchJSON<{ event_id: number; detail: any }>(
+        `/api/football/matches/${eventId}`
+      ),
+
+    getMatchScore: (eventId: number) =>
+      fetchJSON<{ event_id: number; score: any }>(
+        `/api/football/matches/${eventId}/score`
+      ),
+
+    getMatchStatus: (eventId: number) =>
+      fetchJSON<{ event_id: number; status: any }>(
+        `/api/football/matches/${eventId}/status`
+      ),
+
+    getMatchHighlights: (eventId: number) =>
+      fetchJSON<{ event_id: number; highlights: any }>(
+        `/api/football/matches/${eventId}/highlights`
+      ),
+
+    getMatchLocation: (eventId: number) =>
+      fetchJSON<{ event_id: number; location: any }>(
+        `/api/football/matches/${eventId}/location`
+      ),
+
+    getMatchStats: (eventId: number, period: 'all' | 'firstHalf' | 'secondHalf' = 'all') =>
+      fetchJSON<{ event_id: number; period: string; stats: any }>(
+        `/api/football/matches/${eventId}/stats?period=${period}`
+      ),
+
+    getMatchEvents: (eventId: number, period: 'all' | 'firstHalf' | 'secondHalf' = 'all') =>
+      fetchJSON<{ event_id: number; period: string; events: any }>(
+        `/api/football/matches/${eventId}/events?period=${period}`
+      ),
+
+    getMatchReferee: (eventId: number) =>
+      fetchJSON<{ event_id: number; referee: any }>(
+        `/api/football/matches/${eventId}/referee`
+      ),
+
+    getMatchLineups: (eventId: number) =>
+      fetchJSON<{ event_id: number; home: any; away: any }>(
+        `/api/football/matches/${eventId}/lineups`
+      ),
+
+    getHeadToHead: (eventId: number) =>
+      fetchJSON<{ event_id: number; head_to_head: any }>(
+        `/api/football/matches/${eventId}/head-to-head`
+      ),
+
+    // Standings & Leaders
+    getStandings: (leagueId = 47, type: 'all' | 'home' | 'away' = 'all') =>
+      fetchJSON<{
+        league_id: number;
+        type: string;
+        count: number;
+        standings: LiveFootballStanding[];
+      }>(`/api/football/leagues/${leagueId}/standings?type=${type}`),
+
+    getLeaders: (leagueId = 47, category: 'goals' | 'assists' | 'rating' = 'goals') =>
+      fetchJSON<{
+        league_id: number;
+        category: string;
+        count: number;
+        players: LiveFootballPlayerLeader[];
+      }>(`/api/football/leagues/${leagueId}/leaders?category=${category}`),
+
+    // Transfers
+    getTransfers: (params?: {
+      type?: 'top' | 'market_value' | 'all';
+      page?: number;
+    }) => {
+      const q = new URLSearchParams();
+      if (params?.type) q.append('type', params.type);
+      if (params?.page) q.append('page', String(params.page));
+      return fetchJSON<LiveFootballTransfersResponse>(
+        `/api/football/transfers?${q.toString()}`
+      );
+    },
+
+    getLeagueTransfers: (leagueId = 47) =>
+      fetchJSON<{ league_id: number; count: number; transfers: LiveFootballTransfer[] }>(
+        `/api/football/leagues/${leagueId}/transfers`
+      ),
+
+    getTeamTransfers: (teamId: number, type: 'in' | 'out' | 'extensions' = 'in') =>
+      fetchJSON<{ team_id: number; type: string; count: number; transfers: any[] }>(
+        `/api/football/teams/${teamId}/transfers?type=${type}`
+      ),
+
+    // News
+    getNews: (params?: {
+      type?: 'trending' | 'league' | 'team' | 'player';
+      id?: number;
+      page?: number;
+    }) => {
+      const q = new URLSearchParams();
+      if (params?.type) q.append('type', params.type);
+      if (params?.id !== undefined) q.append('id', String(params.id));
+      if (params?.page !== undefined) q.append('page', String(params.page));
+      return fetchJSON<{
+        type: string;
+        id?: number;
+        page: number;
+        count: number;
+        news: LiveFootballNewsItem[];
+      }>(`/api/football/news?${q.toString()}`);
+    },
+
+    // Search
+    search: (
+      query: string,
+      type: 'all' | 'players' | 'teams' | 'leagues' | 'matches' = 'all'
+    ) => {
+      const q = new URLSearchParams({
+        q: query,
+        type,
+      });
+      return fetchJSON<{
+        query: string;
+        type: string;
+        results: LiveFootballSearchResultItem[] | any;
+      }>(`/api/football/search?${q.toString()}`);
+    },
+  },
+
+  // ──────────────────────────────────────────────
+  // Canonical BALL-ON Layer (Provider-Agnostic)
+  // ──────────────────────────────────────────────
+  matches: {
+    live: () =>
+      fetchJSON<BallonApiResponse<{ matches: any[]; count: number; live_count: number }>>(
+        '/api/matches/live'
+      ),
+    byDate: (date?: string, leagueId?: number) => {
+      const q = new URLSearchParams();
+      if (date) q.append('date', date);
+      if (leagueId !== undefined) q.append('league_id', String(leagueId));
+      return fetchJSON<BallonApiResponse<any[]>>(`/api/matches/by-date?${q.toString()}`);
+    },
+    featured: (limit = 8) =>
+      fetchJSON<BallonApiResponse<{ matches: any[]; count: number; live_count: number }>>(
+        `/api/matches/featured?limit=${limit}`
+      ),
+    get: (matchId: number) => fetchJSON<BallonApiResponse<any>>(`/api/matches/${matchId}`),
+    score: (matchId: number) => fetchJSON<BallonApiResponse<any>>(`/api/matches/${matchId}/score`),
+    status: (matchId: number) => fetchJSON<BallonApiResponse<any>>(`/api/matches/${matchId}/status`),
+    statistics: (matchId: number, period: 'all' | 'firstHalf' | 'secondHalf' = 'all') =>
+      fetchJSON<BallonApiResponse<any>>(`/api/matches/${matchId}/statistics?period=${period}`),
+    lineups: (matchId: number) => fetchJSON<BallonApiResponse<any>>(`/api/matches/${matchId}/lineups`),
+    events: (matchId: number, period: 'all' | 'firstHalf' | 'secondHalf' = 'all') =>
+      fetchJSON<BallonApiResponse<any>>(`/api/matches/${matchId}/events?period=${period}`),
+    highlights: (matchId: number) => fetchJSON<BallonApiResponse<any>>(`/api/matches/${matchId}/highlights`),
+    venue: (matchId: number) => fetchJSON<BallonApiResponse<any>>(`/api/matches/${matchId}/venue`),
+    referee: (matchId: number) => fetchJSON<BallonApiResponse<any>>(`/api/matches/${matchId}/referee`),
+    h2h: (matchId: number) => fetchJSON<BallonApiResponse<any>>(`/api/matches/${matchId}/head-to-head`),
+  },
+
+  leagues: {
+    all: () => fetchJSON<BallonApiResponse<any[]>>('/api/leagues'),
+    popular: () => fetchJSON<BallonApiResponse<any[]>>('/api/leagues/popular'),
+    countries: () => fetchJSON<BallonApiResponse<any[]>>('/api/leagues/countries'),
+    seasons: () => fetchJSON<BallonApiResponse<any[]>>('/api/leagues/seasons'),
+    get: (leagueId: number) => fetchJSON<BallonApiResponse<any>>(`/api/leagues/${leagueId}`),
+    standings: (leagueId: number, type: 'all' | 'home' | 'away' = 'all') =>
+      fetchJSON<BallonApiResponse<any>>(`/api/leagues/${leagueId}/standings?type=${type}`),
+    teams: (leagueId: number, type: 'all' | 'home' | 'away' = 'all') =>
+      fetchJSON<BallonApiResponse<any>>(`/api/leagues/${leagueId}/teams?type=${type}`),
+    leaders: (leagueId: number, category: 'goals' | 'assists' | 'rating' = 'goals') =>
+      fetchJSON<BallonApiResponse<any>>(`/api/leagues/${leagueId}/leaders?category=${category}`),
+    transfers: (leagueId: number) => fetchJSON<BallonApiResponse<any>>(`/api/leagues/${leagueId}/transfers`),
+    rounds: (leagueId: number) => fetchJSON<BallonApiResponse<any>>(`/api/leagues/${leagueId}/rounds`),
+    trophies: (leagueId: number) => fetchJSON<BallonApiResponse<any>>(`/api/leagues/${leagueId}/trophies`),
+    news: (leagueId: number, page = 1) => fetchJSON<BallonApiResponse<any>>(`/api/leagues/${leagueId}/news?page=${page}`),
+  },
+
+  teams: {
+    get: (teamId: number) => fetchJSON<BallonApiResponse<any>>(`/api/teams/${teamId}`),
+    squad: (teamId: number) => fetchJSON<BallonApiResponse<any>>(`/api/teams/${teamId}/squad`),
+    transfers: (teamId: number, type: 'in' | 'out' | 'extensions' = 'in') =>
+      fetchJSON<BallonApiResponse<any>>(`/api/teams/${teamId}/transfers?type=${type}`),
+    news: (teamId: number, page = 1) => fetchJSON<BallonApiResponse<any>>(`/api/teams/${teamId}/news?page=${page}`),
+  },
+
+  canonSearch: (query: string, type: 'all' | 'players' | 'teams' | 'leagues' | 'matches' = 'all') => {
+    const q = new URLSearchParams({ q: query, type });
+    return fetchJSON<BallonApiResponse<any>>(`/api/search?${q.toString()}`);
+  },
+};

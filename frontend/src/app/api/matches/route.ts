@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BBS_API_KEY =
-  process.env.BIGBALLSDATA_API_KEY ||
-  process.env.NEXT_PUBLIC_BIGBALLSDATA_API_KEY ||
-  'bbs_live_00000VmNNihAMTZrBtg9eeFAhmhOfglQbOiRePZHVs3yDk21';
+const BBS_API_KEY = process.env.BIGBALLSDATA_API_KEY || '';
 
 const BASE_URL = 'https://api.bigballsdata.com/v1/matches';
 const VALID_STATUSES = new Set(['scheduled', 'live', 'finished', 'postponed', 'cancelled']);
@@ -26,6 +23,10 @@ async function fetchLeagueMatches(
   }
   if (date) {
     url.searchParams.set('date', date);
+  }
+
+  if (!BBS_API_KEY) {
+    return [];
   }
 
   try {
@@ -70,6 +71,32 @@ export async function GET(request: NextRequest) {
 
   const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '36', 10)));
   const date = searchParams.get('date') || undefined;
+
+  // 1. First attempt: Query BALLON backend Live Football API
+  const backendBase = (
+    process.env.NEXT_PUBLIC_API_URL ||
+    (process.env.NODE_ENV === 'production'
+      ? 'https://ball-on.onrender.com'
+      : 'http://127.0.0.1:8080')
+  ).replace(/\/+$/, '');
+
+  try {
+    const backendRes = await fetch(
+      `${backendBase}/api/live/bigballs/matches?${searchParams.toString()}`,
+      { cache: 'no-store' }
+    );
+    if (backendRes.ok) {
+      const backendJson = await backendRes.json();
+      if (backendJson?.data && backendJson.data.length > 0) {
+        return NextResponse.json({
+          ...backendJson,
+          meta: { source: 'live-football-rapidapi', cached: false },
+        });
+      }
+    }
+  } catch (_) {
+    // Fall back to direct upstream fetch
+  }
 
   try {
     // If 'all' or no specific league is given, query the main football leagues in parallel

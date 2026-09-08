@@ -22,6 +22,16 @@ export type {
   TransfermarktTrophy,
   BigBallsMatch,
   BigBallsMatchesResponse,
+  LiveFootballPopularLeague,
+  LiveFootballCountry,
+  LiveFootballLeague,
+  LiveFootballMatch,
+  LiveFootballStanding,
+  LiveFootballPlayerLeader,
+  LiveFootballTransfer,
+  LiveFootballTransfersResponse,
+  LiveFootballNewsItem,
+  LiveFootballSearchResultItem,
 } from '@/lib/types';
 
 

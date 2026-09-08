@@ -669,3 +669,211 @@ export interface FootballNewsResponse {
   last_updated?: string | null;
   articles: FootballNewsArticle[];
 }
+
+// ──────────────────────────────────────────────
+// Live Football Data (RapidAPI) Types
+// ──────────────────────────────────────────────
+
+export interface LiveFootballPopularLeague {
+  id: number;
+  name: string;
+  localizedName?: string;
+  ccode?: string;
+  logo?: string;
+}
+
+export interface LiveFootballCountry {
+  ccode: string;
+  name: string;
+  localizedName?: string;
+  leaguesCount?: number;
+}
+
+export interface LiveFootballLeague {
+  id: number;
+  name: string;
+  localizedName?: string;
+  ccode?: string;
+  logo?: string;
+}
+
+export interface LiveFootballTeamInMatch {
+  id: number;
+  score?: number | null;
+  name: string;
+  longName?: string;
+  redCards?: number;
+}
+
+export interface LiveFootballMatchStatus {
+  utcTime?: string;
+  started?: boolean;
+  finished?: boolean;
+  cancelled?: boolean;
+  ongoing?: boolean;
+  scoreStr?: string;
+  liveTime?: {
+    short?: string;
+    long?: string;
+    maxTime?: number;
+    addedTime?: number;
+  };
+  halfs?: {
+    firstHalfStarted?: string;
+    secondHalfStarted?: string;
+  };
+}
+
+export interface LiveFootballMatch {
+  id: number;
+  leagueId: number;
+  time?: string;
+  timeTS?: number;
+  home: LiveFootballTeamInMatch;
+  away: LiveFootballTeamInMatch;
+  status: LiveFootballMatchStatus;
+  tournamentStage?: string;
+}
+
+export interface LiveFootballStanding {
+  id: number;
+  name: string;
+  shortName: string;
+  pageUrl?: string;
+  played: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  scoresStr: string;
+  goalConDiff: number;
+  pts: number;
+  idx: number;
+  qualColor?: string | null;
+}
+
+export interface LiveFootballPlayerLeader {
+  id: number;
+  name: string;
+  teamId?: number;
+  teamName?: string;
+  goals?: number;
+  assists?: number;
+  rating?: number;
+  value?: number;
+}
+
+export interface LiveFootballTransfer {
+  name: string;
+  playerId: number;
+  position?: {
+    label?: string;
+    key?: string;
+  };
+  transferDate?: string;
+  fromClub?: string;
+  fromClubFullName?: string;
+  fromClubId?: number;
+  toClub?: string;
+  toClubFullName?: string;
+  toClubId?: number;
+  fee?: {
+    feeText?: string;
+    localizedFeeText?: string;
+  };
+  amountEuroEstimated?: number | null;
+  transferType?: {
+    text?: string;
+    localizationKey?: string;
+  };
+  contractExtension?: boolean;
+  onLoan?: boolean;
+  fromDate?: string;
+  toDate?: string;
+  marketValue?: number | null;
+}
+
+export interface LiveFootballTransfersResponse {
+  type: string;
+  transfers: LiveFootballTransfer[];
+  hits?: number;
+  max_fee?: number | null;
+  page?: number;
+}
+
+export interface LiveFootballNewsItem {
+  id: string;
+  imageUrl?: string;
+  title: string;
+  gmtTime: string;
+  sourceStr?: string;
+  sourceIconUrl?: string;
+  page?: {
+    url?: string;
+  };
+}
+
+export interface LiveFootballSearchResultItem {
+  type: 'player' | 'team' | 'league' | 'match' | string;
+  id: string | number;
+  name: string;
+  teamName?: string;
+  teamId?: number;
+  leagueName?: string;
+  score?: number;
+}
+
+export interface FeaturedShowcaseTeam {
+  id?: number;
+  name: string;
+  short: string;
+  logo: string;
+  score?: number | null;
+}
+
+export interface FeaturedShowcaseMatch {
+  id: string | number;
+  leagueId?: number;
+  league: string;
+  leagueIcon: string;
+  priorityRank?: number;
+  isLive: boolean;
+  status: 'live' | 'scheduled' | 'finished';
+  liveMinute?: string | null;
+  home: FeaturedShowcaseTeam;
+  away: FeaturedShowcaseTeam;
+  dateDisplay: string;
+  timeDisplay: string;
+  kickoff_utc?: string | null;
+  initialVotes: {
+    home: number;
+    draw: number;
+    away: number;
+  };
+  odds?: Array<{
+    bookmaker: string;
+    home: string;
+    draw: string;
+    away: string;
+    trend: string;
+  }>;
+}
+
+export interface FeaturedShowcaseResponse {
+  count: number;
+  live_count: number;
+  matches: FeaturedShowcaseMatch[];
+}
+
+export interface BallonApiResponse<T = any> {
+  success: boolean;
+  data: T;
+  source: {
+    provider: string;
+    is_fallback: boolean;
+    provider_chain: string[];
+    confidence: string;
+    timestamp: string;
+  };
+  error?: string | null;
+}
+
